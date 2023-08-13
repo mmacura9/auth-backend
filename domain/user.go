@@ -6,15 +6,15 @@ import (
 )
 
 type User struct {
-	ID         int64     `json:"_id"`
-	Full_name  string    `json:"full_name"`
-	Username   string    `json:"username"`
-	Email      string    `json:"email"`
-	Password   string    `json:"password"`
-	Birth_date time.Time `json:"birth_date"`
-	Created_at time.Time `json:"created_at"`
-	Updated_at time.Time `json:"updated_at"`
-	Last_login time.Time `json:"last_login"`
+	ID        int64     `json:"_id"`
+	FullName  string    `json:"full_name"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+	BirthDate time.Time `json:"birth_date"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	LastLogin time.Time `json:"last_login"`
 }
 
 type UserRepository interface {

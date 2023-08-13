@@ -6,11 +6,11 @@ import (
 )
 
 type SignupRequest struct {
-	Full_name  string    `form:"full_name" binding:"required"`
-	Username   string    `form:"full_name" binding:"required"`
-	Email      string    `form:"email" binding:"required,email"`
-	Password   string    `form:"password" binding:"required"`
-	Birth_date time.Time `form:"birth_date" binding:"required"`
+	FullName  string    `json:"full_name" binding:"required"`
+	Username  string    `json:"username" binding:"required"`
+	Email     string    `json:"email" binding:"required,email"`
+	Password  string    `json:"password" binding:"required"`
+	BirthDate time.Time `json:"birth_date" binding:"required"`
 }
 
 type SignupResponse struct {

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -20,11 +21,13 @@ type SignupController struct {
 func (sc *SignupController) Signup(c *gin.Context) {
 	var request domain.SignupRequest
 
-	err := c.ShouldBind(&request)
+	err := c.ShouldBindJSON(&request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
+
+	fmt.Println(request)
 
 	_, err = sc.SignupUsecase.GetUserByEmail(c, request.Email)
 	if err == nil {
@@ -44,9 +47,11 @@ func (sc *SignupController) Signup(c *gin.Context) {
 	request.Password = string(encryptedPassword)
 
 	user := domain.User{
-		Full_name: request.Full_name,
+		FullName:  request.FullName,
+		Username:  request.Username,
 		Email:     request.Email,
 		Password:  request.Password,
+		BirthDate: request.BirthDate,
 	}
 
 	err = sc.SignupUsecase.Create(c, &user)

@@ -47,10 +47,11 @@ func (urs UserRepositoryStruct) Create(c context.Context, user *domain.User) err
 	usr := CreateUserParams{
 		Username:  user.Username,
 		Email:     user.Email,
-		FullName:  user.Full_name,
+		FullName:  user.FullName,
 		Password:  user.Password,
-		BirthDate: user.Birth_date,
+		BirthDate: user.BirthDate,
 	}
+	fmt.Println(usr)
 	_, err := urs.db.CreateUser(c, usr)
 	return err
 }
@@ -66,15 +67,15 @@ func (urs UserRepositoryStruct) GetByEmail(c context.Context, email string) (dom
 		return domain.User{}, err
 	}
 	output := domain.User{
-		ID:         usr.ID,
-		Username:   usr.Username,
-		Password:   usr.Password,
-		Email:      usr.Email,
-		Full_name:  usr.FullName,
-		Birth_date: usr.BirthDate,
-		Created_at: usr.CreatedAt,
-		Updated_at: usr.UpdatedAt,
-		Last_login: usr.LastLogin,
+		ID:        usr.ID,
+		Username:  usr.Username,
+		Password:  usr.Password,
+		Email:     usr.Email,
+		FullName:  usr.FullName,
+		BirthDate: usr.BirthDate,
+		CreatedAt: usr.CreatedAt,
+		UpdatedAt: usr.UpdatedAt,
+		LastLogin: usr.LastLogin,
 	}
 	return output, err
 }
