@@ -10,13 +10,13 @@ dropdb:
 	docker exec -it postgres dropdb ChooseCruise
 
 migrateup:
-	migrate -path repository/migration -database "$(DB_URL)" -verbose up
+	migrate -path db/migration -database "$(DB_URL)" -verbose up
 
 migratedown:
-	migrate -path repository/migration -database "$(DB_URL)" -verbose down
+	migrate -path db/migration -database "$(DB_URL)" -verbose down
 
 new_migration:
-	migrate create -ext sql -dir repository/migration -seq $(name)
+	migrate create -ext sql -dir db/migration -seq $(name)
 
 sqlcinit:
 	docker run --rm -v "$(pwd):/src" -w /src kjconroy/sqlc init
