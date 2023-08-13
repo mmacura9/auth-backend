@@ -5,11 +5,10 @@ go 1.20
 require (
 	github.com/aead/chacha20poly1305 v0.0.0-20201124145622-1a5aba2a8b29
 	github.com/gin-gonic/gin v1.9.1
-	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.1.2
+	github.com/lib/pq v1.10.9
 	github.com/o1egl/paseto v1.0.0
 	github.com/spf13/viper v1.16.0
-	go.mongodb.org/mongo-driver v1.12.1
 	golang.org/x/crypto v0.12.0
 )
 

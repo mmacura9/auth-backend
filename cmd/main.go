@@ -9,6 +9,7 @@ import (
 	"github.com/ChooseCruise/choosecruise-backend/bootstrap"
 	"github.com/ChooseCruise/choosecruise-backend/repository"
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -23,7 +24,7 @@ func main() {
 	}
 
 	db := repository.NewStore(conn)
-	defer app.CloseDBConnection()
+	// defer app.CloseDBConnection()
 
 	timeout := time.Duration(env.ContextTimeout) * time.Second
 
