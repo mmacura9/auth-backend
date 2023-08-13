@@ -10,6 +10,18 @@ CREATE TABLE IF NOT EXISTS "user" (
   "last_login" timestamptz NOT NULL DEFAULT (now())
 );
 
+
 CREATE INDEX ON "user" ("id");
 
 CREATE INDEX ON "user" ("username");
+
+CREATE TABLE IF NOT EXISTS "sessions" (
+    "id" VARCHAR(100) PRIMARY KEY,
+    "username" varchar NOT NULL,
+    "refresh_token" VARCHAR(511) NOT NULL,
+    "user_agent" VARCHAR(255) NOT NULL,
+    "client_ip" VARCHAR(45) NOT NULL,
+    "is_blocked" BOOLEAN NOT NULL DEFAULT false,
+    "expires_at" TIMESTAMP NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
