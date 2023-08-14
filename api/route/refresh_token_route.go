@@ -13,8 +13,9 @@ import (
 
 func NewRefreshTokenRouter(env *bootstrap.Env, timeout time.Duration, db repository.Store, group *gin.RouterGroup, maker tokenutil.Maker) {
 	ur := repository.NewUserRepository(db)
+	sr := repository.NewSessionRepository(db)
 	rtc := &controller.RefreshTokenController{
-		RefreshTokenUsecase: usecase.NewRefreshTokenUsecase(ur, timeout),
+		RefreshTokenUsecase: usecase.NewRefreshTokenUsecase(ur, sr, timeout),
 		Env:                 env,
 		Maker:               maker,
 	}

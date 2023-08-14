@@ -5,17 +5,21 @@ import (
 	"time"
 
 	"github.com/ChooseCruise/choosecruise-backend/domain"
+	"github.com/ChooseCruise/choosecruise-backend/internal/tokenutil"
+	"github.com/gin-gonic/gin"
 )
 
 type loginUsecase struct {
-	userRepository domain.UserRepository
-	contextTimeout time.Duration
+	userRepository    domain.UserRepository
+	sessionRepository domain.SessionRepository
+	contextTimeout    time.Duration
 }
 
-func NewLoginUsecase(userRepository domain.UserRepository, timeout time.Duration) domain.LoginUsecase {
+func NewLoginUsecase(userRepository domain.UserRepository, sessionRepository domain.SessionRepository, timeout time.Duration) domain.LoginUsecase {
 	return &loginUsecase{
-		userRepository: userRepository,
-		contextTimeout: timeout,
+		userRepository:    userRepository,
+		sessionRepository: sessionRepository,
+		contextTimeout:    timeout,
 	}
 }
 
@@ -25,10 +29,32 @@ func (lu *loginUsecase) GetUserByEmail(c context.Context, email string) (domain.
 	return lu.userRepository.GetByEmail(ctx, email)
 }
 
-// func (lu *loginUsecase) CreateAccessToken(user *domain.User, secret string, expiry int) (accessToken string, err error) {
-// 	return tokenutil.CreateAccessToken(user, secret, expiry)
-// }
+func (lu *loginUsecase) CreateAccessToken(user *domain.User, duration time.Duration, maker tokenutil.Maker) (accessToken string, err error) {
+	accessToken, _, err = maker.CreateToken(user.Username, duration)
+	return accessToken, err
+}
 
-// func (lu *loginUsecase) CreateRefreshToken(user *domain.User, secret string, expiry int) (refreshToken string, err error) {
-// 	return tokenutil.CreateRefreshToken(user, secret, expiry)
-// }
+func (lu *loginUsecase) CreateRefreshToken(user *domain.User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error) {
+	refreshToken, payload, err := maker.CreateToken(user.Username, duration)
+
+	if err != nil {
+		return "", err
+	}
+
+	session := &domain.Session{
+		ID:        payload.ID.String(),
+		Username:  payload.Username,
+		CreatedAt: payload.IssuedAt,
+		ExpiresAt: payload.ExpiredAt,
+		ClientIp:  c.ClientIP(),
+		IsBlocked: false,
+		UserAgent: c.Request.UserAgent(),
+	}
+
+	err = lu.sessionRepository.Create(c, session)
+
+	if err != nil {
+		return "", err
+	}
+	return refreshToken, err
+}

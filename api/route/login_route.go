@@ -13,8 +13,9 @@ import (
 
 func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, db repository.Store, group *gin.RouterGroup, maker tokenutil.Maker) {
 	ur := repository.NewUserRepository(db)
+	sr := repository.NewSessionRepository(db)
 	lc := &controller.LoginController{
-		LoginUsecase: usecase.NewLoginUsecase(ur, timeout),
+		LoginUsecase: usecase.NewLoginUsecase(ur, sr, timeout),
 		Env:          env,
 		Maker:        maker,
 	}

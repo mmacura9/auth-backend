@@ -84,19 +84,76 @@ func (urs UserRepositoryStruct) GetByID(c context.Context, id string) (domain.Us
 	return domain.User{}, nil
 }
 
-// func (r *GetEventsFromUserRow) Scan(scanFn func(dest ...interface{}) error) error {
-// 	var eventTimeStr string
-// 	err := scanFn(&r.ID, &r.IDUser, &r.Title, &eventTimeStr, &r.ID_2, &r.Username, &r.Fullname, &r.Password)
-// 	if err != nil {
-// 		return err
-// 	}
+type SessionRepositoryStruct struct {
+	db Store
+}
 
-// 	parsedTime, err := time.Parse(time.RFC3339Nano, eventTimeStr)
-// 	if err != nil {
-// 		return err
-// 	}
+func NewSessionRepository(db Store) domain.SessionRepository {
+	return SessionRepositoryStruct{db: db}
+}
 
-// 	r.EventTime = parsedTime
+func (srs SessionRepositoryStruct) Create(c context.Context, session *domain.Session) error {
+	params := CreateSessionParams{
+		ID:           session.ID,
+		Username:     session.Username,
+		RefreshToken: session.RefreshToken,
+		UserAgent:    session.UserAgent,
+		ClientIp:     session.ClientIp,
+		IsBlocked:    session.IsBlocked,
+		ExpiresAt:    session.ExpiresAt,
+	}
 
-// 	return nil
-// }
+	_, err := srs.db.CreateSession(c, params)
+
+	return err
+}
+
+func (srs SessionRepositoryStruct) Fetch(c context.Context) ([]domain.Session, error) {
+	sessions, err := srs.db.GetAllSessions(c)
+	var out []domain.Session
+	for i := 0; i < len(sessions); i++ {
+		session := domain.Session{
+			ID:           sessions[i].ID,
+			Username:     sessions[i].Username,
+			RefreshToken: sessions[i].RefreshToken,
+			UserAgent:    sessions[i].UserAgent,
+			ClientIp:     sessions[i].ClientIp,
+			IsBlocked:    sessions[i].IsBlocked,
+			ExpiresAt:    sessions[i].ExpiresAt,
+			CreatedAt:    sessions[i].CreatedAt,
+		}
+		out = append(out, session)
+	}
+	return out, err
+}
+
+func (srs SessionRepositoryStruct) GetByUsername(c context.Context, username string) (domain.Session, error) {
+	session, err := srs.db.GetSessionByUsername(c, username)
+	out := domain.Session{
+		ID:           session.ID,
+		Username:     session.Username,
+		RefreshToken: session.RefreshToken,
+		UserAgent:    session.UserAgent,
+		ClientIp:     session.ClientIp,
+		IsBlocked:    session.IsBlocked,
+		ExpiresAt:    session.ExpiresAt,
+		CreatedAt:    session.CreatedAt,
+	}
+	return out, err
+}
+
+func (srs SessionRepositoryStruct) GetByID(c context.Context, id string) (domain.Session, error) {
+	session, err := srs.db.GetSessionByID(c, id)
+
+	out := domain.Session{
+		ID:           session.ID,
+		Username:     session.Username,
+		RefreshToken: session.RefreshToken,
+		UserAgent:    session.UserAgent,
+		ClientIp:     session.ClientIp,
+		IsBlocked:    session.IsBlocked,
+		ExpiresAt:    session.ExpiresAt,
+		CreatedAt:    session.CreatedAt,
+	}
+	return out, err
+}

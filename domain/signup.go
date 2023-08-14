@@ -3,6 +3,9 @@ package domain
 import (
 	"context"
 	"time"
+
+	"github.com/ChooseCruise/choosecruise-backend/internal/tokenutil"
+	"github.com/gin-gonic/gin"
 )
 
 type SignupRequest struct {
@@ -21,6 +24,6 @@ type SignupResponse struct {
 type SignupUsecase interface {
 	Create(c context.Context, user *User) error
 	GetUserByEmail(c context.Context, email string) (User, error)
-	// CreateAccessToken(user *User, secret string, expiry int) (accessToken string, err error)
-	// CreateRefreshToken(user *User, secret string, expiry int) (refreshToken string, err error)
+	CreateAccessToken(user *User, duration time.Duration, maker tokenutil.Maker) (refreshToken string, err error)
+	CreateRefreshToken(user *User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error)
 }
