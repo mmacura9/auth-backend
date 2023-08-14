@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "user" (
   "id" bigserial PRIMARY KEY,
-  "username" varchar NOT NULL,
-  "email" varchar NOT NULL,
+  "username" varchar NOT NULL UNIQUE,
+  "email" varchar NOT NULL UNIQUE,
   "full_name" varchar NOT NULL,
   "birth_date" timestamptz NOT NULL,
   "password" varchar NOT NULL,
