@@ -38,13 +38,14 @@ func (lc *LoginController) Login(c *gin.Context) {
 		return
 	}
 
-	accessToken, _, err := lc.Maker.CreateToken(user.Username, time.Duration(lc.Env.AccessTokenExpiryHour))
+	accessToken, err := lc.LoginUsecase.CreateAccessToken(&user, time.Duration(lc.Env.RefreshTokenExpiryHour), lc.Maker)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
 
-	refreshToken, _, err := lc.Maker.CreateToken(user.Username, time.Duration(lc.Env.RefreshTokenExpiryHour))
+	refreshToken, err := lc.LoginUsecase.CreateRefreshToken(&user, time.Duration(lc.Env.RefreshTokenExpiryHour), lc.Maker, c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return

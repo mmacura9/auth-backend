@@ -37,13 +37,15 @@ func (rtc *RefreshTokenController) RefreshToken(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, _, err := rtc.Maker.CreateToken(user.Username, time.Duration(rtc.Env.AccessTokenExpiryHour))
+	accessToken, err := rtc.RefreshTokenUsecase.CreateAccessToken(&user, time.Duration(rtc.Env.RefreshTokenExpiryHour), rtc.Maker)
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
 
-	refreshToken, _, err := rtc.Maker.CreateToken(user.Username, time.Duration(rtc.Env.RefreshTokenExpiryHour))
+	refreshToken, err := rtc.RefreshTokenUsecase.CreateRefreshToken(&user, time.Duration(rtc.Env.RefreshTokenExpiryHour), rtc.Maker, ctx)
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return
