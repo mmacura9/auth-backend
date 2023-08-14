@@ -49,13 +49,14 @@ func (su *signupUsecase) CreateRefreshToken(user *domain.User, duration time.Dur
 	}
 
 	session := &domain.Session{
-		ID:        payload.ID.String(),
-		Username:  payload.Username,
-		CreatedAt: payload.IssuedAt,
-		ExpiresAt: payload.ExpiredAt,
-		ClientIp:  c.ClientIP(),
-		IsBlocked: false,
-		UserAgent: c.Request.UserAgent(),
+		ID:           payload.ID.String(),
+		RefreshToken: refreshToken,
+		Username:     payload.Username,
+		CreatedAt:    payload.IssuedAt,
+		ExpiresAt:    payload.ExpiredAt,
+		ClientIp:     c.ClientIP(),
+		IsBlocked:    false,
+		UserAgent:    c.Request.UserAgent(),
 	}
 
 	err = su.sessionRepository.Create(c, session)
