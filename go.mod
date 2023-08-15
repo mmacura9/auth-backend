@@ -1,6 +1,7 @@
 module github.com/ChooseCruise/choosecruise-backend
 
 go 1.20
+<<<<<<< HEAD
 
 require (
 	github.com/aead/chacha20poly1305 v0.0.0-20201124145622-1a5aba2a8b29
@@ -51,3 +52,5 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+=======
+>>>>>>> main
