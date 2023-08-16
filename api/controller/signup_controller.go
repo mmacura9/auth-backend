@@ -1,9 +1,7 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/ChooseCruise/choosecruise-backend/bootstrap"
 	"github.com/ChooseCruise/choosecruise-backend/domain"
@@ -23,15 +21,13 @@ func (sc *SignupController) Signup(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&request)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
+		c.JSON(http.StatusBadRequest, domain.NewErrorResponse(err.Error()))
 		return
 	}
 
-	fmt.Println(request)
-
 	_, err = sc.SignupUsecase.GetUserByEmail(c, request.Email)
 	if err == nil {
-		c.JSON(http.StatusConflict, domain.ErrorResponse{Message: "User already exists with the given email"})
+		c.JSON(http.StatusConflict, domain.NewErrorResponse("User already exists with the given email"))
 		return
 	}
 
@@ -40,7 +36,7 @@ func (sc *SignupController) Signup(c *gin.Context) {
 		bcrypt.DefaultCost,
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, domain.NewErrorResponse(err.Error()))
 		return
 	}
 
@@ -56,19 +52,19 @@ func (sc *SignupController) Signup(c *gin.Context) {
 
 	err = sc.SignupUsecase.Create(c, &user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, domain.NewErrorResponse(err.Error()))
 		return
 	}
 
-	accessToken, err := sc.SignupUsecase.CreateAccessToken(&user, time.Duration(sc.Env.AccessTokenExpiryHour), sc.Maker)
+	accessToken, err := sc.SignupUsecase.CreateAccessToken(&user, sc.Env.AccessTokenExpiry, sc.Maker)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, domain.NewErrorResponse(err.Error()))
 		return
 	}
 
-	refreshToken, err := sc.SignupUsecase.CreateRefreshToken(&user, time.Duration(sc.Env.AccessTokenExpiryHour), sc.Maker, c)
+	refreshToken, err := sc.SignupUsecase.CreateRefreshToken(&user, sc.Env.AccessTokenExpiry, sc.Maker, c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, domain.NewErrorResponse(err.Error()))
 		return
 	}
 

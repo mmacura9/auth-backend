@@ -12,7 +12,7 @@ import (
 )
 
 func Setup(env *bootstrap.Env, timeout time.Duration, db repository.Store, gin *gin.Engine) {
-	tokenMaker, err := tokenutil.NewPastoMaker(env.RefreshTokenSecret)
+	tokenMaker, err := tokenutil.NewPasetoMaker(env.RefreshTokenSecret)
 	if err != nil {
 		log.Fatal("cannot create token maker: %w", err)
 	}

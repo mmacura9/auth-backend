@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ChooseCruise/choosecruise-backend/domain"
 )
@@ -23,7 +22,7 @@ func (urs UserRepositoryStruct) Create(c context.Context, user *domain.User) err
 		Password:  user.Password,
 		BirthDate: user.BirthDate,
 	}
-	fmt.Println(usr)
+
 	_, err := urs.db.CreateUser(c, usr)
 	return err
 }

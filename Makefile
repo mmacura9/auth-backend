@@ -27,4 +27,7 @@ sqlcgenerate:
 test:
 	go test -v -cover ./...
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlcinit sqlcgenerate test new_migration
+mock:
+	mockgen -destination repository/mock/store.go github.com/ChooseCruise/choosecruise-backend/repository Store
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlcinit sqlcgenerate test new_migration mock

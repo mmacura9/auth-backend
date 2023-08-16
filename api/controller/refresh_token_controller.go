@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/ChooseCruise/choosecruise-backend/bootstrap"
 	"github.com/ChooseCruise/choosecruise-backend/domain"
@@ -21,33 +20,31 @@ func (rtc *RefreshTokenController) RefreshToken(ctx *gin.Context) {
 
 	err := ctx.ShouldBind(&request)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, domain.NewErrorResponse(err.Error()))
 		return
 	}
 
 	username, err := rtc.RefreshTokenUsecase.ExtractUsernameFromToken(request.RefreshToken)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, domain.ErrorResponse{Message: "User not found"})
+		ctx.JSON(http.StatusUnauthorized, domain.NewErrorResponse("User not found"))
 		return
 	}
 
 	user, err := rtc.RefreshTokenUsecase.GetUserByUsername(ctx, username)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, domain.ErrorResponse{Message: "User not found"})
+		ctx.JSON(http.StatusUnauthorized, domain.NewErrorResponse("User not found"))
 		return
 	}
 
-	accessToken, err := rtc.RefreshTokenUsecase.CreateAccessToken(&user, time.Duration(rtc.Env.RefreshTokenExpiryHour), rtc.Maker)
-
+	accessToken, err := rtc.RefreshTokenUsecase.CreateAccessToken(&user, rtc.Env.RefreshTokenExpiry, rtc.Maker)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		ctx.JSON(http.StatusInternalServerError, domain.NewErrorResponse(err.Error()))
 		return
 	}
 
-	refreshToken, err := rtc.RefreshTokenUsecase.CreateRefreshToken(&user, time.Duration(rtc.Env.RefreshTokenExpiryHour), rtc.Maker, ctx)
-
+	refreshToken, err := rtc.RefreshTokenUsecase.CreateRefreshToken(&user, rtc.Env.RefreshTokenExpiry, rtc.Maker, ctx)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		ctx.JSON(http.StatusInternalServerError, domain.NewErrorResponse(err.Error()))
 		return
 	}
 
