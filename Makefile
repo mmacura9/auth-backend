@@ -18,7 +18,7 @@ migratedown:
 new_migration:
 	migrate create -ext sql -dir db/migration -seq $(name)
 
-sqlcgenerate:
+sqlc:
 	sqlc generate
 
 test:
@@ -27,4 +27,4 @@ test:
 mock:
 	mockgen -destination db/mock/store.go github.com/ChooseCruise/choosecruise-backend/db/sqlc Store
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlcinit sqlcgenerate test new_migration mock
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test new_migration mock

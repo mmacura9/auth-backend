@@ -6,12 +6,12 @@ RETURNING *;
 -- name: GetUserByUsername :one
 SELECT *
 FROM "user"
-WHERE username = $1 LIMIT 1;
+WHERE "username" = $1 LIMIT 1;
 
 -- name: GetUserByEmail :one
 SELECT *
 FROM "user"
-WHERE email = $1 LIMIT 1;
+WHERE "email" = $1 LIMIT 1;
 
 -- name: GetUserForUpdate :one
 SELECT *

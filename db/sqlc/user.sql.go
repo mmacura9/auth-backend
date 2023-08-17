@@ -60,7 +60,7 @@ func (q *Queries) DeleteUser(ctx context.Context, username string) error {
 const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT id, username, email, full_name, birth_date, password, created_at, updated_at, last_login
 FROM "user"
-WHERE email = $1 LIMIT 1
+WHERE "email" = $1 LIMIT 1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -83,7 +83,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 const getUserByUsername = `-- name: GetUserByUsername :one
 SELECT id, username, email, full_name, birth_date, password, created_at, updated_at, last_login
 FROM "user"
-WHERE username = $1 LIMIT 1
+WHERE "username" = $1 LIMIT 1
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
