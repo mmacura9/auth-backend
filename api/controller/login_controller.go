@@ -37,13 +37,7 @@ func (lc *LoginController) Login(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := lc.LoginUsecase.CreateAccessToken(&user, lc.Env.RefreshTokenExpiry, lc.Maker)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, domain.NewErrorResponse(err.Error()))
-		return
-	}
-
-	refreshToken, err := lc.LoginUsecase.CreateRefreshToken(&user, lc.Env.RefreshTokenExpiry, lc.Maker, c)
+	accessToken, refreshToken, err := lc.LoginUsecase.CreateTokens(&user, lc.Env.AccessTokenExpiry, lc.Env.RefreshTokenExpiry, lc.Maker, c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.NewErrorResponse(err.Error()))
 		return

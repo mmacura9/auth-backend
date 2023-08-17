@@ -18,16 +18,13 @@ migratedown:
 new_migration:
 	migrate create -ext sql -dir db/migration -seq $(name)
 
-sqlcinit:
-	docker run --rm -v "$(pwd):/src" -w /src kjconroy/sqlc init
-
 sqlcgenerate:
-	docker run --rm -v "$(pwd):/src" -w /src kjconroy/sqlc generate
+	sqlc generate
 
 test:
 	go test -v -cover ./...
 
 mock:
-	mockgen -destination repository/mock/store.go github.com/ChooseCruise/choosecruise-backend/repository Store
+	mockgen -destination db/mock/store.go github.com/ChooseCruise/choosecruise-backend/db/sqlc Store
 
 .PHONY: postgres createdb dropdb migrateup migratedown sqlcinit sqlcgenerate test new_migration mock

@@ -3,19 +3,20 @@ package repository
 import (
 	"context"
 
+	db "github.com/ChooseCruise/choosecruise-backend/db/sqlc"
 	"github.com/ChooseCruise/choosecruise-backend/domain"
 )
 
 type SessionRepositoryStruct struct {
-	db Store
+	store Store
 }
 
-func NewSessionRepository(db Store) domain.SessionRepository {
-	return SessionRepositoryStruct{db: db}
+func NewSessionRepository(store Store) domain.SessionRepository {
+	return SessionRepositoryStruct{store: store}
 }
 
 func (srs SessionRepositoryStruct) Create(c context.Context, session *domain.Session) error {
-	params := CreateSessionParams{
+	params := db.CreateSessionParams{
 		ID:           session.ID,
 		Username:     session.Username,
 		RefreshToken: session.RefreshToken,
@@ -25,13 +26,13 @@ func (srs SessionRepositoryStruct) Create(c context.Context, session *domain.Ses
 		ExpiresAt:    session.ExpiresAt,
 	}
 
-	_, err := srs.db.CreateSession(c, params)
+	_, err := srs.store.CreateSession(c, params)
 
 	return err
 }
 
 func (srs SessionRepositoryStruct) Fetch(c context.Context) ([]domain.Session, error) {
-	sessions, err := srs.db.GetAllSessions(c)
+	sessions, err := srs.store.GetAllSessions(c)
 	var out []domain.Session
 	for i := 0; i < len(sessions); i++ {
 		session := domain.Session{
@@ -50,7 +51,7 @@ func (srs SessionRepositoryStruct) Fetch(c context.Context) ([]domain.Session, e
 }
 
 func (srs SessionRepositoryStruct) GetByUsername(c context.Context, username string) (domain.Session, error) {
-	session, err := srs.db.GetSessionByUsername(c, username)
+	session, err := srs.store.GetSessionByUsername(c, username)
 	out := domain.Session{
 		ID:           session.ID,
 		Username:     session.Username,
@@ -65,7 +66,7 @@ func (srs SessionRepositoryStruct) GetByUsername(c context.Context, username str
 }
 
 func (srs SessionRepositoryStruct) GetByID(c context.Context, id string) (domain.Session, error) {
-	session, err := srs.db.GetSessionByID(c, id)
+	session, err := srs.store.GetSessionByID(c, id)
 
 	out := domain.Session{
 		ID:           session.ID,

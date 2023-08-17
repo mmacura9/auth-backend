@@ -29,12 +29,12 @@ func (lu *loginUsecase) GetUserByEmail(c context.Context, email string) (domain.
 	return lu.userRepository.GetByEmail(ctx, email)
 }
 
-func (lu *loginUsecase) CreateAccessToken(user *domain.User, duration time.Duration, maker tokenutil.Maker) (accessToken string, err error) {
+func (lu *loginUsecase) createAccessToken(user *domain.User, duration time.Duration, maker tokenutil.Maker) (accessToken string, err error) {
 	accessToken, _, err = maker.CreateToken(user.Username, duration)
 	return accessToken, err
 }
 
-func (lu *loginUsecase) CreateRefreshToken(user *domain.User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error) {
+func (lu *loginUsecase) createRefreshToken(user *domain.User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error) {
 	refreshToken, payload, err := maker.CreateToken(user.Username, duration)
 
 	if err != nil {
@@ -58,4 +58,14 @@ func (lu *loginUsecase) CreateRefreshToken(user *domain.User, duration time.Dura
 		return "", err
 	}
 	return refreshToken, err
+}
+
+func (lu *loginUsecase) CreateTokens(user *domain.User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker, c *gin.Context) (accessToken string, refreshToken string, err error) {
+	accessToken, err = lu.createAccessToken(user, accDuration, maker)
+	if err != nil {
+		return "", "", err
+	}
+
+	refreshToken, err = lu.createRefreshToken(user, refDuration, maker, c)
+	return
 }

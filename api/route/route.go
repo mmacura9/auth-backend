@@ -11,16 +11,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Setup(env *bootstrap.Env, timeout time.Duration, db repository.Store, gin *gin.Engine) {
+func Setup(env *bootstrap.Env, timeout time.Duration, store repository.Store, gin *gin.Engine) {
 	tokenMaker, err := tokenutil.NewPasetoMaker(env.RefreshTokenSecret)
 	if err != nil {
 		log.Fatal("cannot create token maker: %w", err)
 	}
 	publicRouter := gin.Group("")
 	// All Public APIs
-	NewSignupRouter(env, timeout, db, publicRouter, tokenMaker)
-	NewLoginRouter(env, timeout, db, publicRouter, tokenMaker)
-	NewRefreshTokenRouter(env, timeout, db, publicRouter, tokenMaker)
+	NewSignupRouter(env, timeout, store, publicRouter, tokenMaker)
+	NewLoginRouter(env, timeout, store, publicRouter, tokenMaker)
+	NewRefreshTokenRouter(env, timeout, store, publicRouter, tokenMaker)
 
 	protectedRouter := gin.Group("")
 	// Middleware to verify AccessToken

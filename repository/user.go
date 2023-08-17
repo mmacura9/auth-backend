@@ -3,19 +3,20 @@ package repository
 import (
 	"context"
 
+	db "github.com/ChooseCruise/choosecruise-backend/db/sqlc"
 	"github.com/ChooseCruise/choosecruise-backend/domain"
 )
 
 type UserRepositoryStruct struct {
-	db Store
+	store Store
 }
 
-func NewUserRepository(db Store) domain.UserRepository {
-	return UserRepositoryStruct{db: db}
+func NewUserRepository(store Store) domain.UserRepository {
+	return UserRepositoryStruct{store: store}
 }
 
 func (urs UserRepositoryStruct) Create(c context.Context, user *domain.User) error {
-	usr := CreateUserParams{
+	usr := db.CreateUserParams{
 		Username:  user.Username,
 		Email:     user.Email,
 		FullName:  user.FullName,
@@ -23,7 +24,7 @@ func (urs UserRepositoryStruct) Create(c context.Context, user *domain.User) err
 		BirthDate: user.BirthDate,
 	}
 
-	_, err := urs.db.CreateUser(c, usr)
+	_, err := urs.store.CreateUser(c, usr)
 	return err
 }
 
@@ -33,7 +34,7 @@ func (urs UserRepositoryStruct) Fetch(c context.Context) ([]domain.User, error) 
 }
 
 func (urs UserRepositoryStruct) GetByEmail(c context.Context, email string) (domain.User, error) {
-	usr, err := urs.db.GetUserByEmail(c, email)
+	usr, err := urs.store.GetUserByEmail(c, email)
 	if err != nil {
 		return domain.User{}, err
 	}

@@ -20,6 +20,7 @@ type LoginResponse struct {
 
 type LoginUsecase interface {
 	GetUserByEmail(c context.Context, email string) (User, error)
-	CreateAccessToken(user *User, duration time.Duration, maker tokenutil.Maker) (refreshToken string, err error)
-	CreateRefreshToken(user *User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error)
+	CreateTokens(user *User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker, c *gin.Context) (accessToken string, refreshToken string, err error)
+	// CreateAccessToken(user *User, duration time.Duration, maker tokenutil.Maker) (refreshToken string, err error)
+	// CreateRefreshToken(user *User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error)
 }

@@ -29,12 +29,12 @@ func (rtu *refreshTokenUsecase) GetUserByUsername(c context.Context, username st
 	return rtu.userRepository.GetByID(ctx, username)
 }
 
-func (rtu *refreshTokenUsecase) CreateAccessToken(user *domain.User, duration time.Duration, maker tokenutil.Maker) (accessToken string, err error) {
+func (rtu *refreshTokenUsecase) createAccessToken(user *domain.User, duration time.Duration, maker tokenutil.Maker) (accessToken string, err error) {
 	accessToken, _, err = maker.CreateToken(user.Username, duration)
 	return accessToken, err
 }
 
-func (rtu *refreshTokenUsecase) CreateRefreshToken(user *domain.User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error) {
+func (rtu *refreshTokenUsecase) createRefreshToken(user *domain.User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error) {
 	refreshToken, payload, err := maker.CreateToken(user.Username, duration)
 
 	if err != nil {
@@ -59,7 +59,22 @@ func (rtu *refreshTokenUsecase) CreateRefreshToken(user *domain.User, duration t
 	}
 	return refreshToken, err
 }
-func (rtu *refreshTokenUsecase) ExtractUsernameFromToken(requestToken string) (string, error) {
-	// return tokenutil.ExtractIDFromToken(requestToken, secret)
-	return "", nil //TODO
+
+func (rtu *refreshTokenUsecase) ExtractUsernameFromToken(requestToken string, maker tokenutil.Maker) (string, error) {
+	payload, err := maker.VerifyToken(requestToken)
+	if err != nil {
+		return "", err
+	}
+
+	return payload.Username, nil
+}
+
+func (rtu *refreshTokenUsecase) CreateTokens(user *domain.User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker, c *gin.Context) (accessToken string, refreshToken string, err error) {
+	accessToken, err = rtu.createAccessToken(user, accDuration, maker)
+	if err != nil {
+		return "", "", err
+	}
+
+	refreshToken, err = rtu.createRefreshToken(user, refDuration, maker, c)
+	return
 }

@@ -19,7 +19,8 @@ type RefreshTokenResponse struct {
 
 type RefreshTokenUsecase interface {
 	GetUserByUsername(c context.Context, id string) (User, error)
-	CreateAccessToken(user *User, duration time.Duration, maker tokenutil.Maker) (refreshToken string, err error)
-	CreateRefreshToken(user *User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error)
-	ExtractUsernameFromToken(requestToken string) (string, error)
+	// createAccessToken(user *User, duration time.Duration, maker tokenutil.Maker) (accessToken string, err error)
+	// createRefreshToken(user *User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error)
+	CreateTokens(user *User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker, c *gin.Context) (accessToken string, refreshToken string, err error)
+	ExtractUsernameFromToken(requestToken string, maker tokenutil.Maker) (string, error)
 }

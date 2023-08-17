@@ -35,13 +35,13 @@ func (su *signupUsecase) GetUserByEmail(c context.Context, email string) (domain
 	return su.userRepository.GetByEmail(ctx, email)
 }
 
-func (rtu *signupUsecase) CreateAccessToken(user *domain.User, duration time.Duration, maker tokenutil.Maker) (accessToken string, err error) {
+func (rtu *signupUsecase) createAccessToken(user *domain.User, duration time.Duration, maker tokenutil.Maker) (accessToken string, err error) {
 	accessToken, _, err = maker.CreateToken(user.Username, duration)
 	return accessToken, err
 }
 
 // TODO: make a function in tokenutil for this
-func (su *signupUsecase) CreateRefreshToken(user *domain.User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error) {
+func (su *signupUsecase) createRefreshToken(user *domain.User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error) {
 	refreshToken, payload, err := maker.CreateToken(user.Username, duration)
 
 	if err != nil {
@@ -65,4 +65,14 @@ func (su *signupUsecase) CreateRefreshToken(user *domain.User, duration time.Dur
 		return "", err
 	}
 	return refreshToken, err
+}
+
+func (su *signupUsecase) CreateTokens(user *domain.User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker, c *gin.Context) (accessToken string, refreshToken string, err error) {
+	accessToken, err = su.createAccessToken(user, accDuration, maker)
+	if err != nil {
+		return "", "", err
+	}
+
+	refreshToken, err = su.createRefreshToken(user, refDuration, maker, c)
+	return
 }

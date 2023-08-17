@@ -4,29 +4,31 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
+	db "github.com/ChooseCruise/choosecruise-backend/db/sqlc"
 )
 
 type Store interface {
-	Querier
-	execTx(ctx context.Context, fn func(*Queries) error) error
+	db.Querier
+	execTx(ctx context.Context, fn func(*db.Queries) error) error
 }
 
 type SQLStore struct {
-	*Queries
-	db *sql.DB
+	*db.Queries
+	sqldb *sql.DB
 }
 
-func NewStore(db *sql.DB) Store {
-	return &SQLStore{Queries: New(db), db: db}
+func NewStore(sqldb *sql.DB) Store {
+	return &SQLStore{Queries: db.New(sqldb), sqldb: sqldb}
 }
 
-func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
-	tx, err := store.db.BeginTx(ctx, nil)
+func (store *SQLStore) execTx(ctx context.Context, fn func(*db.Queries) error) error {
+	tx, err := store.sqldb.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
 
-	q := New(tx)
+	q := db.New(tx)
 	err = fn(q)
 	if err != nil {
 		if rberr := tx.Rollback(); rberr != nil {

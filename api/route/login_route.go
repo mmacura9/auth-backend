@@ -11,9 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, db repository.Store, group *gin.RouterGroup, maker tokenutil.Maker) {
-	ur := repository.NewUserRepository(db)
-	sr := repository.NewSessionRepository(db)
+func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, store repository.Store, group *gin.RouterGroup, maker tokenutil.Maker) {
+	ur := repository.NewUserRepository(store)
+	sr := repository.NewSessionRepository(store)
 	lc := &controller.LoginController{
 		LoginUsecase: usecase.NewLoginUsecase(ur, sr, timeout),
 		Env:          env,

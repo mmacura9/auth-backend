@@ -18,18 +18,19 @@ func main() {
 
 	env := app.Env
 
-	conn, err := sql.Open(env.DBHost, env.DBSource)
+	conn, err := sql.Open(env.DBDriver, env.DBSource)
 	if err != nil {
 		log.Fatal("cannot connect to the db: ", err)
 	}
 
-	db := repository.NewStore(conn)
+	store := repository.NewStore(conn)
 
-	timeout := time.Duration(env.ContextTimeout) * time.Second
+	// timeout := time.Duration(env.ContextTimeout) * time.Second
+	timeout := time.Second * 2
 
 	gin := gin.Default()
 
-	route.Setup(env, timeout, db, gin)
+	route.Setup(env, timeout, store, gin)
 
 	gin.Run(env.ServerAddress)
 }
