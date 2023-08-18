@@ -56,5 +56,37 @@ func TestGetUserByEmail(t *testing.T) {
 	require.Equal(t, user.Username, user1.Username)
 	require.Equal(t, user.FullName, user1.FullName)
 	require.Equal(t, user.Password, user1.Password)
+}
 
+func TestDeleteUser(t *testing.T) {
+	user := createRandomUser(t)
+
+	err := testQueries.DeleteUser(context.Background(), user.Username)
+	require.NoError(t, err)
+
+	user1, err := testQueries.GetUserByEmail(context.Background(), user.Email)
+	require.Error(t, err)
+	require.Empty(t, user1)
+}
+
+func TestGetUserByUsername(t *testing.T) {
+	user := createRandomUser(t)
+
+	user1, err := testQueries.GetUserByUsername(context.Background(), user.Username)
+	require.NoError(t, err)
+	require.NotEmpty(t, user1)
+
+	require.NotZero(t, user1.ID)
+	require.NotZero(t, user1.Username)
+	require.NotZero(t, user1.FullName)
+	require.NotZero(t, user1.Email)
+	require.NotZero(t, user1.Password)
+	require.NotZero(t, user1.CreatedAt)
+	require.NotZero(t, user1.LastLogin)
+	require.NotZero(t, user1.UpdatedAt)
+
+	require.Equal(t, user.Email, user1.Email)
+	require.Equal(t, user.Username, user1.Username)
+	require.Equal(t, user.FullName, user1.FullName)
+	require.Equal(t, user.Password, user1.Password)
 }
