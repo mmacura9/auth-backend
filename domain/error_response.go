@@ -5,5 +5,5 @@ type ErrorResponse struct {
 }
 
 func NewErrorResponse(msg string) ErrorResponse {
-	return NewErrorResponse(msg)
+	return ErrorResponse{Message: msg}
 }
