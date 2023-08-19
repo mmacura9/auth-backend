@@ -6,16 +6,11 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 type Querier interface {
-	CreateSession(ctx context.Context, arg CreateSessionParams) (sql.Result, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteUser(ctx context.Context, username string) error
-	GetAllSessions(ctx context.Context) ([]Session, error)
-	GetSessionByID(ctx context.Context, id string) (Session, error)
-	GetSessionByUsername(ctx context.Context, username string) (Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserForUpdate(ctx context.Context, username string) (User, error)
