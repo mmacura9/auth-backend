@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/ChooseCruise/choosecruise-backend/internal/randomutil"
 	"github.com/stretchr/testify/require"
@@ -56,6 +57,10 @@ func TestGetUserByEmail(t *testing.T) {
 	require.Equal(t, user.Username, user1.Username)
 	require.Equal(t, user.FullName, user1.FullName)
 	require.Equal(t, user.Password, user1.Password)
+	require.WithinDuration(t, user.BirthDate, user1.BirthDate, time.Second)
+	require.WithinDuration(t, user.CreatedAt, user1.CreatedAt, time.Second)
+	require.WithinDuration(t, user.UpdatedAt, user1.UpdatedAt, time.Second)
+	require.WithinDuration(t, user.LastLogin, user1.LastLogin, time.Second)
 }
 
 func TestDeleteUser(t *testing.T) {
@@ -89,4 +94,8 @@ func TestGetUserByUsername(t *testing.T) {
 	require.Equal(t, user.Username, user1.Username)
 	require.Equal(t, user.FullName, user1.FullName)
 	require.Equal(t, user.Password, user1.Password)
+	require.WithinDuration(t, user.BirthDate, user1.BirthDate, time.Second)
+	require.WithinDuration(t, user.CreatedAt, user1.CreatedAt, time.Second)
+	require.WithinDuration(t, user.UpdatedAt, user1.UpdatedAt, time.Second)
+	require.WithinDuration(t, user.LastLogin, user1.LastLogin, time.Second)
 }
