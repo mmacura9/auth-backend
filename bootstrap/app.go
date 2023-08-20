@@ -6,6 +6,6 @@ type Application struct {
 
 func App() Application {
 	app := &Application{}
-	app.Env = NewEnv()
+	app.Env = LoadEnv("..")
 	return *app
 }
