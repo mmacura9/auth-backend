@@ -8,10 +8,10 @@ import (
 )
 
 type UserRepositoryStruct struct {
-	store Store
+	store db.Store
 }
 
-func NewUserRepository(store Store) domain.UserRepository {
+func NewUserRepository(store db.Store) domain.UserRepository {
 	return UserRepositoryStruct{store: store}
 }
 
