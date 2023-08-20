@@ -13,7 +13,7 @@ import (
 var testQueries *Queries
 
 func TestMain(m *testing.M) {
-	env := bootstrap.NewEnv()
+	env := bootstrap.LoadEnv("../..")
 	conn, err := sql.Open(env.DBDriver, env.DBSource)
 
 	if err != nil {

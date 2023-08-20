@@ -7,15 +7,15 @@ import (
 	"github.com/ChooseCruise/choosecruise-backend/domain"
 )
 
-type UserRepositoryStruct struct {
+type userRepository struct {
 	store db.Store
 }
 
 func NewUserRepository(store db.Store) domain.UserRepository {
-	return UserRepositoryStruct{store: store}
+	return userRepository{store: store}
 }
 
-func (urs UserRepositoryStruct) Create(c context.Context, user *domain.User) error {
+func (urs userRepository) Create(c context.Context, user *domain.User) error {
 	usr := db.CreateUserParams{
 		Username:  user.Username,
 		Email:     user.Email,
@@ -28,12 +28,12 @@ func (urs UserRepositoryStruct) Create(c context.Context, user *domain.User) err
 	return err
 }
 
-func (urs UserRepositoryStruct) Fetch(c context.Context) ([]domain.User, error) {
+func (urs userRepository) Fetch(c context.Context) ([]domain.User, error) {
 
 	return nil, nil
 }
 
-func (urs UserRepositoryStruct) GetByEmail(c context.Context, email string) (domain.User, error) {
+func (urs userRepository) GetByEmail(c context.Context, email string) (domain.User, error) {
 	usr, err := urs.store.GetUserByEmail(c, email)
 	if err != nil {
 		return domain.User{}, err
@@ -50,8 +50,4 @@ func (urs UserRepositoryStruct) GetByEmail(c context.Context, email string) (dom
 		LastLogin: usr.LastLogin,
 	}
 	return output, err
-}
-
-func (urs UserRepositoryStruct) GetByID(c context.Context, id string) (domain.User, error) {
-	return domain.User{}, nil
 }
