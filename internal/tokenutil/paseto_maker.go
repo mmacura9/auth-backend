@@ -1,26 +1,29 @@
 package tokenutil
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
+	"strings"
 	"time"
 
+	"aidanwoods.dev/go-paseto"
 	"github.com/aead/chacha20poly1305"
-	"github.com/o1egl/paseto"
 )
 
 type PasetoMaker struct {
-	paseto       *paseto.V2
-	symmetricKey []byte
+	symmetricKey paseto.V4SymmetricKey
+	implicit     []byte
 }
 
-func NewPasetoMaker(symmetricKey string) (Maker, error) {
-	if len(symmetricKey) != chacha20poly1305.KeySize {
-		return nil, fmt.Errorf("invalid key size: must have exactly %d characters", chacha20poly1305.KeySize)
+func NewPasetoMaker(implicit string) (Maker, error) {
+	if len(implicit) != chacha20poly1305.KeySize {
+		return nil, fmt.Errorf("Invalid implicit part size: must have exactly %d characters", chacha20poly1305.KeySize)
 	}
 
 	maker := &PasetoMaker{
-		paseto:       paseto.NewV2(),
-		symmetricKey: []byte(symmetricKey),
+		symmetricKey: paseto.NewV4SymmetricKey(),
+		implicit:     []byte(implicit),
 	}
 
 	return maker, nil
@@ -28,29 +31,71 @@ func NewPasetoMaker(symmetricKey string) (Maker, error) {
 
 func (maker *PasetoMaker) CreateToken(username string, duration time.Duration) (string, *Payload, error) {
 	payload, err := NewPayload(username, duration)
-
 	if err != nil {
-		return "", nil, err
+		return "", payload, err
 	}
 
-	token, err := maker.paseto.Encrypt(maker.symmetricKey, payload, nil)
-	return token, payload, err
+	payloadJson, err := json.Marshal(payload)
+	if err != nil {
+		return "", payload, err
+	}
+
+	token, err := paseto.NewTokenFromClaimsJSON(payloadJson, nil)
+	if err != nil {
+		return "", payload, err
+	}
+
+	encryptedToken := token.V4Encrypt(maker.symmetricKey, maker.implicit)
+
+	return encryptedToken, payload, err
 }
 
 func (maker *PasetoMaker) VerifyToken(token string) (*Payload, error) {
-	payload := &Payload{}
+	parser := paseto.NewParser()
+	parser.AddRule(paseto.NotExpired())
+	parsedToken, err := parser.ParseV4Local(maker.symmetricKey, token, maker.implicit)
+	if err != nil {
+		if strings.Contains(err.Error(), "expired") {
+			return nil, ErrorExpiredToken
+		}
+		return nil, ErrorInvalidToken
+	}
 
-	err := maker.paseto.Decrypt(token, maker.symmetricKey, payload, nil)
-
+	payload, err := getPayloadFromToken(parsedToken)
 	if err != nil {
 		return nil, err
 	}
 
 	err = payload.Valid()
-
 	if err != nil {
 		return nil, err
 	}
 
 	return payload, nil
+}
+
+func getPayloadFromToken(t *paseto.Token) (*Payload, error) {
+	id, err := t.GetString("id")
+	if err != nil {
+		return nil, ErrorInvalidToken
+	}
+	username, err := t.GetString("username")
+	if err != nil {
+		return nil, ErrorInvalidToken
+	}
+	issuedAt, err := t.GetIssuedAt()
+	if err != nil {
+		return nil, ErrorInvalidToken
+	}
+	expiredAt, err := t.GetExpiration()
+	if err != nil {
+		return nil, ErrorInvalidToken
+	}
+
+	return &Payload{
+		ID:        uuid.MustParse(id),
+		Username:  username,
+		IssuedAt:  issuedAt,
+		ExpiredAt: expiredAt,
+	}, nil
 }
