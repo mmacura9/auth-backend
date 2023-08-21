@@ -10,8 +10,8 @@ import (
 type Payload struct {
 	ID        uuid.UUID `json:"id"`
 	Username  string    `json:"username"`
-	IssuedAt  time.Time `json:"issued_at"`
-	ExpiredAt time.Time `json:"expired_at"`
+	IssuedAt  time.Time `json:"iat"`
+	ExpiredAt time.Time `json:"exp"`
 }
 
 var (
@@ -25,7 +25,12 @@ func NewPayload(username string, duration time.Duration) (*Payload, error) {
 		return nil, err
 	}
 
-	return &Payload{ID: tokenID, Username: username, IssuedAt: time.Now(), ExpiredAt: time.Now().Add(duration)}, nil
+	return &Payload{
+		ID:        tokenID,
+		Username:  username,
+		IssuedAt:  time.Now(),
+		ExpiredAt: time.Now().Add(duration),
+	}, nil
 }
 
 func (payload *Payload) Valid() error {
