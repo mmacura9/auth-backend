@@ -3,7 +3,6 @@ package tokenutil
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"strings"
 	"time"
 
@@ -75,27 +74,8 @@ func (maker *PasetoMaker) VerifyToken(token string) (*Payload, error) {
 }
 
 func getPayloadFromToken(t *paseto.Token) (*Payload, error) {
-	id, err := t.GetString("id")
-	if err != nil {
-		return nil, ErrorInvalidToken
-	}
-	username, err := t.GetString("username")
-	if err != nil {
-		return nil, ErrorInvalidToken
-	}
-	issuedAt, err := t.GetIssuedAt()
-	if err != nil {
-		return nil, ErrorInvalidToken
-	}
-	expiredAt, err := t.GetExpiration()
-	if err != nil {
-		return nil, ErrorInvalidToken
-	}
+	payload := Payload{}
+	err := json.Unmarshal(t.ClaimsJSON(), &payload)
 
-	return &Payload{
-		ID:        uuid.MustParse(id),
-		Username:  username,
-		IssuedAt:  issuedAt,
-		ExpiredAt: expiredAt,
-	}, nil
+	return &payload, err
 }
