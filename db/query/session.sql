@@ -1,4 +1,4 @@
--- name: CreateSession :execresult
+-- name: CreateSession :one
 INSERT INTO sessions (
     id,
     username,
@@ -9,7 +9,8 @@ INSERT INTO sessions (
     expires_at
 ) VALUES (
 $1, $2, $3, $4, $5, $6, $7
-);
+)
+RETURNING *;
 
 -- name: GetSessionByUsername :one
 SELECT *

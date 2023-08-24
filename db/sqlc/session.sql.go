@@ -7,11 +7,10 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"time"
 )
 
-const createSession = `-- name: CreateSession :execresult
+const createSession = `-- name: CreateSession :one
 INSERT INTO sessions (
     id,
     username,
@@ -23,6 +22,7 @@ INSERT INTO sessions (
 ) VALUES (
 $1, $2, $3, $4, $5, $6, $7
 )
+RETURNING id, username, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at
 `
 
 type CreateSessionParams struct {
@@ -35,8 +35,8 @@ type CreateSessionParams struct {
 	ExpiresAt    time.Time `json:"expires_at"`
 }
 
-func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createSession,
+func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {
+	row := q.db.QueryRowContext(ctx, createSession,
 		arg.ID,
 		arg.Username,
 		arg.RefreshToken,
@@ -45,6 +45,18 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (s
 		arg.IsBlocked,
 		arg.ExpiresAt,
 	)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.RefreshToken,
+		&i.UserAgent,
+		&i.ClientIp,
+		&i.IsBlocked,
+		&i.ExpiresAt,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const getAllSessions = `-- name: GetAllSessions :many
