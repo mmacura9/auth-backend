@@ -49,18 +49,18 @@ func TestCreateSession(t *testing.T) {
 func TestGetSessionById(t *testing.T) {
 	session := createRandomSession(t)
 
-	session1, err := testQueries.GetSessionByID(context.Background(), session.ID)
+	s1, err := testQueries.GetSessionByID(context.Background(), session.ID)
 	require.NoError(t, err)
-	require.NotEmpty(t, session1)
+	require.NotEmpty(t, s1)
 
-	require.Equal(t, session.ID, session1.ID)
-	require.Equal(t, session.Username, session1.Username)
-	require.Equal(t, session.UserAgent, session1.UserAgent)
-	require.Equal(t, session.RefreshToken, session1.RefreshToken)
-	require.Equal(t, session.ClientIp, session1.ClientIp)
-	require.Equal(t, session.IsBlocked, session1.IsBlocked)
-	require.WithinDuration(t, session.CreatedAt, session1.CreatedAt, time.Second)
-	require.WithinDuration(t, session.ExpiresAt, session1.ExpiresAt, time.Second)
+	require.Equal(t, session.ID, s1.ID)
+	require.Equal(t, session.Username, s1.Username)
+	require.Equal(t, session.UserAgent, s1.UserAgent)
+	require.Equal(t, session.RefreshToken, s1.RefreshToken)
+	require.Equal(t, session.ClientIp, s1.ClientIp)
+	require.Equal(t, session.IsBlocked, s1.IsBlocked)
+	require.WithinDuration(t, session.CreatedAt, s1.CreatedAt, time.Second)
+	require.WithinDuration(t, session.ExpiresAt, s1.ExpiresAt, time.Second)
 }
 
 func TestGetSessionByUsername(t *testing.T) {
@@ -70,12 +70,14 @@ func TestGetSessionByUsername(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, session1)
 
-	require.Equal(t, session.ID, session1.ID)
-	require.Equal(t, session.Username, session1.Username)
-	require.Equal(t, session.UserAgent, session1.UserAgent)
-	require.Equal(t, session.RefreshToken, session1.RefreshToken)
-	require.Equal(t, session.ClientIp, session1.ClientIp)
-	require.Equal(t, session.IsBlocked, session1.IsBlocked)
-	require.WithinDuration(t, session.CreatedAt, session1.CreatedAt, time.Second)
-	require.WithinDuration(t, session.ExpiresAt, session1.ExpiresAt, time.Second)
+	s1 := session1[0]
+	require.NotEmpty(t, s1)
+	require.Equal(t, session.ID, s1.ID)
+	require.Equal(t, session.Username, s1.Username)
+	require.Equal(t, session.UserAgent, s1.UserAgent)
+	require.Equal(t, session.RefreshToken, s1.RefreshToken)
+	require.Equal(t, session.ClientIp, s1.ClientIp)
+	require.Equal(t, session.IsBlocked, s1.IsBlocked)
+	require.WithinDuration(t, session.CreatedAt, s1.CreatedAt, time.Second)
+	require.WithinDuration(t, session.ExpiresAt, s1.ExpiresAt, time.Second)
 }

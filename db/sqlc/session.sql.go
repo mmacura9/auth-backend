@@ -99,7 +99,7 @@ func (q *Queries) GetAllSessions(ctx context.Context) ([]Session, error) {
 const getSessionByID = `-- name: GetSessionByID :one
 SELECT id, username, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at
 FROM sessions
-WHERE id = $1 LIMIT 1
+WHERE id = $1
 `
 
 func (q *Queries) GetSessionByID(ctx context.Context, id string) (Session, error) {
@@ -118,24 +118,40 @@ func (q *Queries) GetSessionByID(ctx context.Context, id string) (Session, error
 	return i, err
 }
 
-const getSessionByUsername = `-- name: GetSessionByUsername :one
+const getSessionByUsername = `-- name: GetSessionByUsername :many
 SELECT id, username, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at
 FROM sessions
-WHERE username = $1 LIMIT 1
+WHERE username = $1
 `
 
-func (q *Queries) GetSessionByUsername(ctx context.Context, username string) (Session, error) {
-	row := q.db.QueryRowContext(ctx, getSessionByUsername, username)
-	var i Session
-	err := row.Scan(
-		&i.ID,
-		&i.Username,
-		&i.RefreshToken,
-		&i.UserAgent,
-		&i.ClientIp,
-		&i.IsBlocked,
-		&i.ExpiresAt,
-		&i.CreatedAt,
-	)
-	return i, err
+func (q *Queries) GetSessionByUsername(ctx context.Context, username string) ([]Session, error) {
+	rows, err := q.db.QueryContext(ctx, getSessionByUsername, username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Session{}
+	for rows.Next() {
+		var i Session
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.RefreshToken,
+			&i.UserAgent,
+			&i.ClientIp,
+			&i.IsBlocked,
+			&i.ExpiresAt,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

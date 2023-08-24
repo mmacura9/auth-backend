@@ -50,17 +50,20 @@ func (srs sessionRepository) Fetch(c context.Context) ([]domain.Session, error) 
 	return out, err
 }
 
-func (srs sessionRepository) GetByUsername(c context.Context, username string) (domain.Session, error) {
+func (srs sessionRepository) GetByUsername(c context.Context, username string) ([]domain.Session, error) {
 	session, err := srs.store.GetSessionByUsername(c, username)
-	out := domain.Session{
-		ID:           session.ID,
-		Username:     session.Username,
-		RefreshToken: session.RefreshToken,
-		UserAgent:    session.UserAgent,
-		ClientIp:     session.ClientIp,
-		IsBlocked:    session.IsBlocked,
-		ExpiresAt:    session.ExpiresAt,
-		CreatedAt:    session.CreatedAt,
+	var out []domain.Session
+	for i := 0; i < len(session); i++ {
+		out = append(out, domain.Session{
+			ID:           session[i].ID,
+			Username:     session[i].Username,
+			RefreshToken: session[i].RefreshToken,
+			UserAgent:    session[i].UserAgent,
+			ClientIp:     session[i].ClientIp,
+			IsBlocked:    session[i].IsBlocked,
+			ExpiresAt:    session[i].ExpiresAt,
+			CreatedAt:    session[i].CreatedAt,
+		})
 	}
 	return out, err
 }

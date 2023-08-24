@@ -19,6 +19,6 @@ type Session struct {
 type SessionRepository interface {
 	Create(c context.Context, session *Session) error
 	Fetch(c context.Context) ([]Session, error)
-	GetByUsername(c context.Context, email string) (Session, error)
+	GetByUsername(c context.Context, email string) ([]Session, error)
 	GetByID(c context.Context, id string) (Session, error)
 }

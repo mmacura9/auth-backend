@@ -14,7 +14,7 @@ type Querier interface {
 	DeleteUser(ctx context.Context, username string) error
 	GetAllSessions(ctx context.Context) ([]Session, error)
 	GetSessionByID(ctx context.Context, id string) (Session, error)
-	GetSessionByUsername(ctx context.Context, username string) (Session, error)
+	GetSessionByUsername(ctx context.Context, username string) ([]Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserForUpdate(ctx context.Context, username string) (User, error)

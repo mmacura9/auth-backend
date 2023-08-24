@@ -12,15 +12,15 @@ $1, $2, $3, $4, $5, $6, $7
 )
 RETURNING *;
 
--- name: GetSessionByUsername :one
+-- name: GetSessionByUsername :many
 SELECT *
 FROM sessions
-WHERE username = $1 LIMIT 1;
+WHERE username = $1;
 
 -- name: GetSessionByID :one
 SELECT *
 FROM sessions
-WHERE id = $1 LIMIT 1;
+WHERE id = $1;
 
 -- name: GetAllSessions :many
 SELECT *
