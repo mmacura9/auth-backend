@@ -3,6 +3,8 @@ package domain
 import (
 	"context"
 	"time"
+
+	db "github.com/ChooseCruise/choosecruise-backend/db/sqlc"
 )
 
 type Session struct {
@@ -21,4 +23,17 @@ type SessionRepository interface {
 	Fetch(c context.Context) ([]Session, error)
 	GetByUsername(c context.Context, email string) ([]Session, error)
 	GetByID(c context.Context, id string) (Session, error)
+}
+
+func ToSessionDomain(session db.Session) *Session {
+	return &Session{
+		ID:           session.ID,
+		Username:     session.Username,
+		RefreshToken: session.RefreshToken,
+		UserAgent:    session.UserAgent,
+		ClientIp:     session.ClientIp,
+		IsBlocked:    session.IsBlocked,
+		ExpiresAt:    session.ExpiresAt,
+		CreatedAt:    session.CreatedAt,
+	}
 }

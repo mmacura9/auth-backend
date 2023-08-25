@@ -38,16 +38,6 @@ func (urs userRepository) GetByEmail(c context.Context, email string) (domain.Us
 	if err != nil {
 		return domain.User{}, err
 	}
-	output := domain.User{
-		ID:        usr.ID,
-		Username:  usr.Username,
-		Password:  usr.Password,
-		Email:     usr.Email,
-		FullName:  usr.FullName,
-		BirthDate: usr.BirthDate,
-		CreatedAt: usr.CreatedAt,
-		UpdatedAt: usr.UpdatedAt,
-		LastLogin: usr.LastLogin,
-	}
-	return output, err
+	output := domain.ToUserDomain(usr)
+	return *output, err
 }
