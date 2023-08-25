@@ -14,6 +14,7 @@ import (
 
 var testStore db.Store
 var userRep domain.UserRepository
+var sessionRep domain.SessionRepository
 
 func TestMain(m *testing.M) {
 	env := bootstrap.LoadEnv("..")
@@ -25,6 +26,7 @@ func TestMain(m *testing.M) {
 
 	testStore = db.NewStore(conn)
 	userRep = NewUserRepository(testStore)
+	sessionRep = NewSessionRepository(testStore)
 
 	os.Exit(m.Run())
 }
