@@ -27,11 +27,11 @@ func createRandomUser(t *testing.T) domain.User {
 	return arg
 }
 
-func TestCreate(t *testing.T) {
+func TestCreateUser(t *testing.T) {
 	createRandomUser(t)
 }
 
-func TestGetByEmail(t *testing.T) {
+func TestGetUserByEmail(t *testing.T) {
 	user := createRandomUser(t)
 
 	user1, err := userRep.GetByEmail(context.Background(), user.Email)

@@ -5,17 +5,30 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 )
 
+type Session struct {
+	ID           string    `json:"id"`
+	Username     string    `json:"username"`
+	RefreshToken string    `json:"refresh_token"`
+	UserAgent    string    `json:"user_agent"`
+	ClientIp     string    `json:"client_ip"`
+	IsBlocked    bool      `json:"is_blocked"`
+	ExpiresAt    time.Time `json:"expires_at"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
 type User struct {
-	ID        int64     `json:"id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	FullName  string    `json:"full_name"`
-	BirthDate time.Time `json:"birth_date"`
-	Password  string    `json:"password"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	LastLogin time.Time `json:"last_login"`
+	ID        int64        `json:"id"`
+	Username  string       `json:"username"`
+	Email     string       `json:"email"`
+	FullName  string       `json:"full_name"`
+	BirthDate time.Time    `json:"birth_date"`
+	Password  string       `json:"password"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	LastLogin time.Time    `json:"last_login"`
+	DeletedAt sql.NullTime `json:"deleted_at"`
 }
