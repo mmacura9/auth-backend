@@ -19,8 +19,6 @@ func Setup(env *bootstrap.Env, timeout time.Duration, store db.Store, gin *gin.E
 	publicRouter := gin.Group("")
 	// All Public APIs
 	NewSignupRouter(env, timeout, store, publicRouter, tokenMaker)
-	NewLoginRouter(env, timeout, store, publicRouter, tokenMaker)
-	NewRefreshTokenRouter(env, timeout, store, publicRouter, tokenMaker)
 
 	protectedRouter := gin.Group("")
 	// Middleware to verify AccessToken
