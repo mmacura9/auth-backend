@@ -41,3 +41,12 @@ func (urs userRepository) GetByEmail(c context.Context, email string) (domain.Us
 	output := domain.ToUserDomain(usr)
 	return *output, err
 }
+
+func (urs userRepository) GetByUsername(c context.Context, username string) (domain.User, error) {
+	usr, err := urs.store.GetUserByUsername(c, username)
+	if err != nil {
+		return domain.User{}, err
+	}
+	output := domain.ToUserDomain(usr)
+	return *output, err
+}

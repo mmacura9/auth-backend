@@ -1,5 +1,8 @@
 DB_URL=postgresql://root:secret@localhost:5432/ChooseCruise?sslmode=disable
 
+start:
+	go run cmd/main.go
+
 postgres:
 	docker run --name postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres
 
@@ -27,4 +30,4 @@ test:
 mock:
 	mockgen -destination db/mock/store.go github.com/ChooseCruise/choosecruise-backend/db/sqlc Store
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test new_migration mock
+.PHONY: start postgres createdb dropdb migrateup migratedown sqlc test new_migration mock
