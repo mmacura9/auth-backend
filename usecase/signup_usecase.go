@@ -35,6 +35,12 @@ func (su *signupUsecase) GetUserByEmail(c context.Context, email string) (domain
 	return su.userRepository.GetByEmail(ctx, email)
 }
 
+func (su *signupUsecase) GetUserByUsername(c context.Context, email string) (domain.User, error) {
+	ctx, cancel := context.WithTimeout(c, su.contextTimeout)
+	defer cancel()
+	return su.userRepository.GetByUsername(ctx, email)
+}
+
 func (rtu *signupUsecase) createAccessToken(user *domain.User, duration time.Duration, maker tokenutil.Maker) (accessToken string, err error) {
 	accessToken, _, err = maker.CreateToken(user.Username, duration)
 	return accessToken, err

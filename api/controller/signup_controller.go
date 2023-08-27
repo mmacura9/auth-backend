@@ -31,6 +31,12 @@ func (sc *SignupController) Signup(c *gin.Context) {
 		return
 	}
 
+	_, err = sc.SignupUsecase.GetUserByUsername(c, request.Username)
+	if err == nil {
+		c.JSON(http.StatusConflict, domain.NewErrorResponse("User already exists with the given username"))
+		return
+	}
+
 	encryptedPassword, err := bcrypt.GenerateFromPassword(
 		[]byte(request.Password),
 		bcrypt.DefaultCost,

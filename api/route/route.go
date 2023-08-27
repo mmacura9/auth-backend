@@ -16,13 +16,14 @@ func Setup(env *bootstrap.Env, timeout time.Duration, store db.Store, gin *gin.E
 	if err != nil {
 		log.Fatal("cannot create token maker: %w", err)
 	}
-	publicRouter := gin.Group("")
+	apiRouter := gin.Group("api")
+	v1Router := apiRouter.Group("v1")
 	// All Public APIs
-	NewSignupRouter(env, timeout, store, publicRouter, tokenMaker)
+	NewSignupRouter(env, timeout, store, v1Router, tokenMaker)
 
-	protectedRouter := gin.Group("")
+	authV1Router := v1Router.Group("auth")
 	// Middleware to verify AccessToken
-	protectedRouter.Use(middleware.AuthMiddleware(tokenMaker))
+	authV1Router.Use(middleware.AuthMiddleware(tokenMaker))
 	// All Private APIs
 
 }

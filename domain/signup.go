@@ -24,7 +24,6 @@ type SignupResponse struct {
 type SignupUsecase interface {
 	Create(c context.Context, user *User) error
 	GetUserByEmail(c context.Context, email string) (User, error)
+	GetUserByUsername(c context.Context, username string) (User, error)
 	CreateTokens(user *User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker, c *gin.Context) (accessToken string, refreshToken string, err error)
-	// CreateAccessToken(user *User, duration time.Duration, maker tokenutil.Maker) (refreshToken string, err error)
-	// CreateRefreshToken(user *User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error)
 }
