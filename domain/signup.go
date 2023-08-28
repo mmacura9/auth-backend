@@ -25,5 +25,5 @@ type SignupUsecase interface {
 	Create(c context.Context, user *User) error
 	GetUserByEmail(c context.Context, email string) (User, error)
 	GetUserByUsername(c context.Context, username string) (User, error)
-	CreateTokens(user *User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker, c *gin.Context) (accessToken string, refreshToken string, err error)
+	CreateTokens(c *gin.Context, user *User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker) (accessToken string, refreshToken string, err error)
 }

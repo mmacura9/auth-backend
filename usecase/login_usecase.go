@@ -60,7 +60,7 @@ func (lu *loginUsecase) createRefreshToken(user *domain.User, duration time.Dura
 	return refreshToken, err
 }
 
-func (lu *loginUsecase) CreateTokens(user *domain.User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker, c *gin.Context) (accessToken string, refreshToken string, err error) {
+func (lu *loginUsecase) CreateTokens(c *gin.Context, user *domain.User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker) (accessToken string, refreshToken string, err error) {
 	accessToken, err = lu.createAccessToken(user, accDuration, maker)
 	if err != nil {
 		return "", "", err

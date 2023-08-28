@@ -15,30 +15,30 @@ type RefreshTokenController struct {
 	Maker               tokenutil.Maker
 }
 
-func (rtc *RefreshTokenController) RefreshToken(ctx *gin.Context) {
+func (rtc *RefreshTokenController) RefreshToken(c *gin.Context) {
 	var request domain.RefreshTokenRequest
 
-	err := ctx.ShouldBind(&request)
+	err := c.ShouldBind(&request)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, domain.NewErrorResponse(err.Error()))
+		c.JSON(http.StatusBadRequest, domain.NewErrorResponse(err.Error()))
 		return
 	}
 
 	username, err := rtc.RefreshTokenUsecase.ExtractUsernameFromToken(request.RefreshToken, rtc.Maker)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, domain.NewErrorResponse("User not found"))
+		c.JSON(http.StatusUnauthorized, domain.NewErrorResponse("User not found"))
 		return
 	}
 
-	user, err := rtc.RefreshTokenUsecase.GetUserByUsername(ctx, username)
+	user, err := rtc.RefreshTokenUsecase.GetUserByUsername(c, username)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, domain.NewErrorResponse("User not found"))
+		c.JSON(http.StatusUnauthorized, domain.NewErrorResponse("User not found"))
 		return
 	}
 
-	accessToken, refreshToken, err := rtc.RefreshTokenUsecase.CreateTokens(ctx, &user, rtc.Env.AccessTokenExpiry, rtc.Env.RefreshTokenExpiry, rtc.Maker, request.RefreshToken)
+	accessToken, refreshToken, err := rtc.RefreshTokenUsecase.CreateTokens(c, &user, rtc.Env.AccessTokenExpiry, rtc.Env.RefreshTokenExpiry, rtc.Maker, request.RefreshToken)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, domain.NewErrorResponse(err.Error()))
+		c.JSON(http.StatusInternalServerError, domain.NewErrorResponse(err.Error()))
 		return
 	}
 
@@ -47,5 +47,5 @@ func (rtc *RefreshTokenController) RefreshToken(ctx *gin.Context) {
 		RefreshToken: refreshToken,
 	}
 
-	ctx.JSON(http.StatusOK, refreshTokenResponse)
+	c.JSON(http.StatusOK, refreshTokenResponse)
 }
