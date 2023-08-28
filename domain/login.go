@@ -14,8 +14,8 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type LoginUsecase interface {

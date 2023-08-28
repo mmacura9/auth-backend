@@ -9,12 +9,12 @@ import (
 )
 
 type RefreshTokenRequest struct {
-	RefreshToken string `form:"refreshToken" binding:"required"`
+	RefreshToken string `form:"refresh_token" binding:"required"`
 }
 
 type RefreshTokenResponse struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type RefreshTokenUsecase interface {
