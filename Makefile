@@ -1,5 +1,11 @@
 DB_URL=postgresql://root:secret@localhost:5432/ChooseCruise?sslmode=disable
 
+getdep:
+	go get ./...
+
+updatedep:
+	go get -u -d ./...
+
 start:
 	go run cmd/main.go
 
@@ -30,4 +36,4 @@ test:
 mock:
 	mockgen -destination db/mock/store.go github.com/ChooseCruise/choosecruise-backend/db/sqlc Store
 
-.PHONY: start postgres createdb dropdb migrateup migratedown sqlc test new_migration mock
+.PHONY: getdep updatedep start postgres createdb dropdb migrateup migratedown sqlc test new_migration mock
