@@ -2,9 +2,11 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	db "github.com/ChooseCruise/choosecruise-backend/db/sqlc"
 	"github.com/ChooseCruise/choosecruise-backend/domain"
+	"github.com/ChooseCruise/choosecruise-backend/internal/tokenutil"
 )
 
 type sessionRepository struct {
@@ -58,4 +60,32 @@ func (srs sessionRepository) GetByID(c context.Context, id string) (domain.Sessi
 
 	out := domain.ToSessionDomain(session)
 	return *out, err
+}
+
+func (srs sessionRepository) UpdateByID(c context.Context, maker tokenutil.Maker, id string, refreshToken string) (domain.Session, error) {
+	session, err := srs.store.GetSessionByID(c, id)
+
+	if err != nil {
+		return domain.Session{}, err
+	}
+
+	payload, err := maker.VerifyToken(refreshToken)
+
+	if err != nil {
+		return domain.Session{}, err
+	}
+
+	if payload.Username != session.Username {
+		return domain.Session{}, fmt.Errorf("User not authorized to extend session")
+	}
+
+	arg := db.UpdateSessionParams{
+		ID:           id,
+		ExpiresAt:    payload.ExpiredAt,
+		RefreshToken: refreshToken,
+	}
+	session1, err := srs.store.UpdateSession(c, arg)
+	sessionOut := domain.ToSessionDomain(session1)
+
+	return *sessionOut, err
 }
