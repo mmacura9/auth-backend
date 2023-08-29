@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -23,8 +24,8 @@ func TestSignupAPI(t *testing.T) {
 
 	user := randomUser()
 	maker, err := tokenutil.NewPasetoMaker(env.RefreshTokenSecret)
-
 	require.NoError(t, err)
+
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -32,11 +33,11 @@ func TestSignupAPI(t *testing.T) {
 
 	signupUsecase.EXPECT().
 		GetUserByEmail(gomock.Any(), gomock.Any()).
-		Return(domain.User{}, nil)
+		Return(domain.User{}, sql.ErrNoRows)
 
 	signupUsecase.EXPECT().
 		GetUserByUsername(gomock.Any(), gomock.Any()).
-		Return(domain.User{}, nil)
+		Return(domain.User{}, sql.ErrNoRows)
 
 	signupUsecase.EXPECT().
 		Create(gomock.Any(), gomock.Any()).
@@ -49,12 +50,12 @@ func TestSignupAPI(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	url := "/api/v1/auth/signup"
-	values := map[string]string{
-		"username":   user.Username,
-		"password":   user.Password,
-		"email":      user.Email,
-		"birth_date": user.BirthDate.String(),
+	values := gin.H{
 		"full_name":  user.FullName,
+		"username":   user.Username,
+		"email":      user.Email,
+		"password":   user.Password,
+		"birth_date": user.BirthDate,
 	}
 
 	jsonValue, err := json.Marshal(values)
@@ -69,7 +70,7 @@ func TestSignupAPI(t *testing.T) {
 		Maker:         maker,
 	}
 	router := gin.Default()
-	router.PUT(url, sc.Signup)
+	router.POST(url, sc.Signup)
 
 	router.ServeHTTP(recorder, request)
 	require.Equal(t, http.StatusOK, recorder.Code)
@@ -79,6 +80,7 @@ func randomUser() domain.User {
 	return domain.User{
 		ID:        randomutil.RandomInt(1, 1000),
 		FullName:  randomutil.RandomFullName(),
+		Username:  randomutil.RandomUsername(),
 		Email:     randomutil.RandomEmail(),
 		Password:  randomutil.RandomPassword(),
 		BirthDate: randomutil.RandomBirthDate(),

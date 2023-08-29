@@ -198,17 +198,3 @@ func (mr *MockStoreMockRecorder) UpdateUser(arg0, arg1 interface{}) *gomock.Call
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockStore)(nil).UpdateUser), arg0, arg1)
 }
-
-// execTx mocks base method.
-func (m *MockStore) execTx(arg0 context.Context, arg1 func(*db.Queries) error) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "execTx", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// execTx indicates an expected call of execTx.
-func (mr *MockStoreMockRecorder) execTx(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "execTx", reflect.TypeOf((*MockStore)(nil).execTx), arg0, arg1)
-}
