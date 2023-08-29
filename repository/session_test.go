@@ -15,10 +15,10 @@ func createRandomSession(t *testing.T) domain.Session {
 	maker, err := tokenutil.NewPasetoMaker(randomutil.RandomString(32))
 	require.NoError(t, err)
 
-	Sessionname := randomutil.RandomUsername()
+	username := randomutil.RandomUsername()
 	duration := time.Second
 
-	token, payload, err := maker.CreateToken(Sessionname, duration)
+	token, payload, err := maker.CreateToken(username, duration)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 	require.NotEmpty(t, payload)
@@ -49,7 +49,7 @@ func TestCreateSession(t *testing.T) {
 	createRandomSession(t)
 }
 
-func TestGetSessionBySessionname(t *testing.T) {
+func TestGetSessionByUsername(t *testing.T) {
 	session := createRandomSession(t)
 
 	sessions, err := sessionRep.GetByUsername(context.Background(), session.Username)

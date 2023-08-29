@@ -41,13 +41,13 @@ func (su *signupUsecase) GetUserByUsername(c context.Context, email string) (dom
 	return su.userRepository.GetByUsername(ctx, email)
 }
 
-func (su *signupUsecase) CreateTokens(user *domain.User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker, c *gin.Context) (accessToken string, refreshToken string, err error) {
+func (su *signupUsecase) CreateTokens(c *gin.Context, user *domain.User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker) (accessToken string, refreshToken string, err error) {
 	accessToken, err = su.createAccessToken(user, accDuration, maker)
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err = su.createRefreshToken(user, refDuration, maker, c)
+	refreshToken, err = su.createRefreshToken(c, user, refDuration, maker)
 	return
 }
 
@@ -56,7 +56,7 @@ func (su *signupUsecase) createAccessToken(user *domain.User, duration time.Dura
 	return accessToken, err
 }
 
-func (su *signupUsecase) createRefreshToken(user *domain.User, duration time.Duration, maker tokenutil.Maker, c *gin.Context) (refreshToken string, err error) {
+func (su *signupUsecase) createRefreshToken(c *gin.Context, user *domain.User, duration time.Duration, maker tokenutil.Maker) (refreshToken string, err error) {
 	refreshToken, payload, err := maker.CreateToken(user.Username, duration)
 
 	if err != nil {

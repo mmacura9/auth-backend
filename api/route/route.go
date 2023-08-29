@@ -18,6 +18,11 @@ func Setup(env *bootstrap.Env, timeout time.Duration, store db.Store, gin *gin.E
 	apiRouter := gin.Group("api")
 	v1Router := apiRouter.Group("v1")
 	authV1Router := v1Router.Group("auth")
-	NewSignupRouter(env, timeout, store, authV1Router, tokenMaker)
 
+	// Group api/v1/auth
+	{
+		NewSignupRouter(env, timeout, store, authV1Router, tokenMaker)
+		NewLoginRouter(env, timeout, store, authV1Router, tokenMaker)
+		NewRefreshTokenRouter(env, timeout, store, authV1Router, tokenMaker)
+	}
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	db "github.com/ChooseCruise/choosecruise-backend/db/sqlc"
+	"github.com/ChooseCruise/choosecruise-backend/internal/tokenutil"
 )
 
 type Session struct {
@@ -21,8 +22,9 @@ type Session struct {
 type SessionRepository interface {
 	Create(c context.Context, session *Session) error
 	Fetch(c context.Context) ([]Session, error)
-	GetByUsername(c context.Context, email string) ([]Session, error)
+	GetByUsername(c context.Context, username string) ([]Session, error)
 	GetByID(c context.Context, id string) (Session, error)
+	UpdateByID(c context.Context, maker tokenutil.Maker, id string, refreshToken string) (Session, error)
 }
 
 func ToSessionDomain(session db.Session) *Session {
