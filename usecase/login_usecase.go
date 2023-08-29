@@ -29,6 +29,16 @@ func (lu *loginUsecase) GetUserByEmail(c context.Context, email string) (domain.
 	return lu.userRepository.GetByEmail(ctx, email)
 }
 
+func (lu *loginUsecase) CreateTokens(c *gin.Context, user *domain.User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker) (accessToken string, refreshToken string, err error) {
+	accessToken, err = lu.createAccessToken(user, accDuration, maker)
+	if err != nil {
+		return "", "", err
+	}
+
+	refreshToken, err = lu.createRefreshToken(user, refDuration, maker, c)
+	return
+}
+
 func (lu *loginUsecase) createAccessToken(user *domain.User, duration time.Duration, maker tokenutil.Maker) (accessToken string, err error) {
 	accessToken, _, err = maker.CreateToken(user.Username, duration)
 	return accessToken, err
@@ -58,14 +68,4 @@ func (lu *loginUsecase) createRefreshToken(user *domain.User, duration time.Dura
 		return "", err
 	}
 	return refreshToken, err
-}
-
-func (lu *loginUsecase) CreateTokens(c *gin.Context, user *domain.User, accDuration time.Duration, refDuration time.Duration, maker tokenutil.Maker) (accessToken string, refreshToken string, err error) {
-	accessToken, err = lu.createAccessToken(user, accDuration, maker)
-	if err != nil {
-		return "", "", err
-	}
-
-	refreshToken, err = lu.createRefreshToken(user, refDuration, maker, c)
-	return
 }

@@ -25,5 +25,4 @@ func Setup(env *bootstrap.Env, timeout time.Duration, store db.Store, gin *gin.E
 		NewLoginRouter(env, timeout, store, authV1Router, tokenMaker)
 		NewRefreshTokenRouter(env, timeout, store, authV1Router, tokenMaker)
 	}
-
 }

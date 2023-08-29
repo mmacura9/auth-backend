@@ -64,13 +64,11 @@ func (srs sessionRepository) GetByID(c context.Context, id string) (domain.Sessi
 
 func (srs sessionRepository) UpdateByID(c context.Context, maker tokenutil.Maker, id string, refreshToken string) (domain.Session, error) {
 	session, err := srs.store.GetSessionByID(c, id)
-
 	if err != nil {
 		return domain.Session{}, err
 	}
 
 	payload, err := maker.VerifyToken(refreshToken)
-
 	if err != nil {
 		return domain.Session{}, err
 	}
