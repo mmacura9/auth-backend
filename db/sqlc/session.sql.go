@@ -11,14 +11,14 @@ import (
 )
 
 const createSession = `-- name: CreateSession :one
-INSERT INTO sessions (
-    id,
-    username,
-    refresh_token,
-    user_agent,
-    client_ip,
-    is_blocked,
-    expires_at
+INSERT INTO "sessions" (
+    "id",
+    "username",
+    "refresh_token",
+    "user_agent",
+    "client_ip",
+    "is_blocked",
+    "expires_at"
 ) VALUES (
 $1, $2, $3, $4, $5, $6, $7
 )
@@ -61,7 +61,7 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (S
 
 const getAllSessions = `-- name: GetAllSessions :many
 SELECT id, username, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at
-FROM sessions
+FROM "sessions"
 `
 
 func (q *Queries) GetAllSessions(ctx context.Context) ([]Session, error) {
@@ -98,8 +98,8 @@ func (q *Queries) GetAllSessions(ctx context.Context) ([]Session, error) {
 
 const getSessionByID = `-- name: GetSessionByID :one
 SELECT id, username, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at
-FROM sessions
-WHERE id = $1
+FROM "sessions"
+WHERE "id" = $1
 `
 
 func (q *Queries) GetSessionByID(ctx context.Context, id string) (Session, error) {
@@ -120,8 +120,8 @@ func (q *Queries) GetSessionByID(ctx context.Context, id string) (Session, error
 
 const getSessionByUsername = `-- name: GetSessionByUsername :many
 SELECT id, username, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at
-FROM sessions
-WHERE username = $1
+FROM "sessions"
+WHERE "username" = $1
 `
 
 func (q *Queries) GetSessionByUsername(ctx context.Context, username string) ([]Session, error) {
@@ -154,4 +154,33 @@ func (q *Queries) GetSessionByUsername(ctx context.Context, username string) ([]
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateSession = `-- name: UpdateSession :one
+UPDATE "sessions" 
+SET "refresh_token"=$1, "expires_at"=$2
+WHERE "id" = $3
+RETURNING id, username, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at
+`
+
+type UpdateSessionParams struct {
+	RefreshToken string    `json:"refresh_token"`
+	ExpiresAt    time.Time `json:"expires_at"`
+	ID           string    `json:"id"`
+}
+
+func (q *Queries) UpdateSession(ctx context.Context, arg UpdateSessionParams) (Session, error) {
+	row := q.db.QueryRowContext(ctx, updateSession, arg.RefreshToken, arg.ExpiresAt, arg.ID)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.RefreshToken,
+		&i.UserAgent,
+		&i.ClientIp,
+		&i.IsBlocked,
+		&i.ExpiresAt,
+		&i.CreatedAt,
+	)
+	return i, err
 }

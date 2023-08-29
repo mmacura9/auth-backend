@@ -19,6 +19,7 @@ type Querier interface {
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserForUpdate(ctx context.Context, username string) (User, error)
 	ListUser(ctx context.Context) ([]User, error)
+	UpdateSession(ctx context.Context, arg UpdateSessionParams) (Session, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }
 

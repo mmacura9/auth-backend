@@ -53,7 +53,7 @@ func (mr *MockSignupUsecaseMockRecorder) Create(arg0, arg1 interface{}) *gomock.
 }
 
 // CreateTokens mocks base method.
-func (m *MockSignupUsecase) CreateTokens(arg0 *domain.User, arg1, arg2 time.Duration, arg3 tokenutil.Maker, arg4 *gin.Context) (string, string, error) {
+func (m *MockSignupUsecase) CreateTokens(arg0 *gin.Context, arg1 *domain.User, arg2, arg3 time.Duration, arg4 tokenutil.Maker) (string, string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateTokens", arg0, arg1, arg2, arg3, arg4)
 	ret0, _ := ret[0].(string)
