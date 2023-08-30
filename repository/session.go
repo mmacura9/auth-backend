@@ -35,6 +35,10 @@ func (srs sessionRepository) Create(c context.Context, session *domain.Session) 
 
 func (srs sessionRepository) GetByUsername(c context.Context, username string) ([]domain.Session, error) {
 	sessions, err := srs.store.GetSessionByUsername(c, username)
+	if err != nil {
+		return []domain.Session{}, err
+	}
+
 	var out []domain.Session
 
 	for _, sessionEntity := range sessions {
