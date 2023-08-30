@@ -47,6 +47,9 @@ func (srs sessionRepository) GetByUsername(c context.Context, username string) (
 
 func (srs sessionRepository) GetByID(c context.Context, id string) (domain.Session, error) {
 	session, err := srs.store.GetSessionByID(c, id)
+	if err != nil {
+		return domain.Session{}, err
+	}
 
 	out := domain.ToSessionDomain(session)
 	return *out, err

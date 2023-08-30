@@ -67,3 +67,26 @@ func TestGetSessionByUsername(t *testing.T) {
 	require.WithinDuration(t, session.CreatedAt, session1.CreatedAt, time.Second)
 	require.WithinDuration(t, session.ExpiresAt, session1.ExpiresAt, time.Second)
 }
+
+func TestGetSessionByID(t *testing.T) {
+	session := createRandomSession(t)
+
+	session1, err := sessionRep.GetByID(context.Background(), session.ID)
+	require.NoError(t, err)
+	require.NotEmpty(t, session1)
+
+	require.Equal(t, session.ID, session1.ID)
+	require.Equal(t, session.Username, session1.Username)
+	require.Equal(t, session.UserAgent, session1.UserAgent)
+	require.Equal(t, session.RefreshToken, session1.RefreshToken)
+	require.Equal(t, session.ClientIp, session1.ClientIp)
+	require.Equal(t, session.IsBlocked, session1.IsBlocked)
+	require.WithinDuration(t, session.CreatedAt, session1.CreatedAt, time.Second)
+	require.WithinDuration(t, session.ExpiresAt, session1.ExpiresAt, time.Second)
+}
+
+func TestGetSessionByIDNoSessionError(t *testing.T) {
+	session, err := sessionRep.GetByID(context.Background(), "...")
+	require.Error(t, err)
+	require.Empty(t, session)
+}
