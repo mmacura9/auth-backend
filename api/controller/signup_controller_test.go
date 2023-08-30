@@ -23,57 +23,150 @@ func TestSignupAPI(t *testing.T) {
 	env := bootstrap.LoadEnv("../..")
 
 	user := randomUser()
-	maker, err := tokenutil.NewPasetoMaker(env.RefreshTokenSecret)
-	require.NoError(t, err)
 
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	testCases := []struct {
+		name          string
+		userID        int64
+		buildStubs    func(signupUsecase *mock_domain.MockSignupUsecase)
+		checkResponce func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name:   "OK",
+			userID: user.ID,
+			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
+				signupUsecase.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Return(domain.User{}, sql.ErrNoRows)
 
-	signupUsecase := mock_domain.NewMockSignupUsecase(ctrl)
+				signupUsecase.EXPECT().
+					GetUserByUsername(gomock.Any(), gomock.Any()).
+					Return(domain.User{}, sql.ErrNoRows)
 
-	signupUsecase.EXPECT().
-		GetUserByEmail(gomock.Any(), gomock.Any()).
-		Return(domain.User{}, sql.ErrNoRows)
+				signupUsecase.EXPECT().
+					Create(gomock.Any(), gomock.Any()).
+					Return(nil)
 
-	signupUsecase.EXPECT().
-		GetUserByUsername(gomock.Any(), gomock.Any()).
-		Return(domain.User{}, sql.ErrNoRows)
+				signupUsecase.EXPECT().
+					CreateTokens(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Return("token1", "token2", nil)
+			},
+			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name:   "FoundEmail",
+			userID: user.ID,
+			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
+				signupUsecase.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Return(user, nil)
+			},
+			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusConflict, recorder.Code)
+			},
+		},
+		{
+			name:   "FoundUsername",
+			userID: user.ID,
+			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
+				signupUsecase.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Return(domain.User{}, sql.ErrNoRows)
 
-	signupUsecase.EXPECT().
-		Create(gomock.Any(), gomock.Any()).
-		Return(nil)
+				signupUsecase.EXPECT().
+					GetUserByUsername(gomock.Any(), gomock.Any()).
+					Return(user, nil)
+			},
+			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusConflict, recorder.Code)
+			},
+		},
+		{
+			name:   "CreateError",
+			userID: user.ID,
+			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
+				signupUsecase.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Return(domain.User{}, sql.ErrNoRows)
 
-	signupUsecase.EXPECT().
-		CreateTokens(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return("token1", "token2", nil)
+				signupUsecase.EXPECT().
+					GetUserByUsername(gomock.Any(), gomock.Any()).
+					Return(domain.User{}, sql.ErrNoRows)
 
-	recorder := httptest.NewRecorder()
+				signupUsecase.EXPECT().
+					Create(gomock.Any(), gomock.Any()).
+					Return(sql.ErrConnDone)
+			},
+			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name:   "CreateTokensError",
+			userID: user.ID,
+			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
+				signupUsecase.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Return(domain.User{}, sql.ErrNoRows)
 
-	url := "/api/v1/auth/signup"
-	values := gin.H{
-		"full_name":  user.FullName,
-		"username":   user.Username,
-		"email":      user.Email,
-		"password":   user.Password,
-		"birth_date": user.BirthDate,
+				signupUsecase.EXPECT().
+					GetUserByUsername(gomock.Any(), gomock.Any()).
+					Return(domain.User{}, sql.ErrNoRows)
+
+				signupUsecase.EXPECT().
+					Create(gomock.Any(), gomock.Any()).
+					Return(nil)
+
+				signupUsecase.EXPECT().
+					CreateTokens(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Return("", "", sql.ErrConnDone)
+			},
+			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
 	}
 
-	jsonValue, err := json.Marshal(values)
-	require.NoError(t, err)
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			maker, err := tokenutil.NewPasetoMaker(env.RefreshTokenSecret)
+			require.NoError(t, err)
 
-	request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonValue))
-	require.NoError(t, err)
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-	sc := SignupController{
-		SignupUsecase: signupUsecase,
-		Env:           env,
-		Maker:         maker,
+			signupUsecase := mock_domain.NewMockSignupUsecase(ctrl)
+			testCase.buildStubs(signupUsecase)
+			recorder := httptest.NewRecorder()
+
+			url := "/api/v1/auth/signup"
+			values := gin.H{
+				"full_name":  user.FullName,
+				"username":   user.Username,
+				"email":      user.Email,
+				"password":   user.Password,
+				"birth_date": user.BirthDate,
+			}
+
+			jsonValue, err := json.Marshal(values)
+			require.NoError(t, err)
+
+			request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonValue))
+			require.NoError(t, err)
+
+			sc := SignupController{
+				SignupUsecase: signupUsecase,
+				Env:           env,
+				Maker:         maker,
+			}
+			router := gin.Default()
+			router.POST(url, sc.Signup)
+
+			router.ServeHTTP(recorder, request)
+			testCase.checkResponce(t, recorder)
+		})
 	}
-	router := gin.Default()
-	router.POST(url, sc.Signup)
-
-	router.ServeHTTP(recorder, request)
-	require.Equal(t, http.StatusOK, recorder.Code)
 }
 
 func randomUser() domain.User {
