@@ -59,43 +59,6 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (S
 	return i, err
 }
 
-const getAllSessions = `-- name: GetAllSessions :many
-SELECT id, username, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at
-FROM "sessions"
-`
-
-func (q *Queries) GetAllSessions(ctx context.Context) ([]Session, error) {
-	rows, err := q.db.QueryContext(ctx, getAllSessions)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []Session{}
-	for rows.Next() {
-		var i Session
-		if err := rows.Scan(
-			&i.ID,
-			&i.Username,
-			&i.RefreshToken,
-			&i.UserAgent,
-			&i.ClientIp,
-			&i.IsBlocked,
-			&i.ExpiresAt,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getSessionByID = `-- name: GetSessionByID :one
 SELECT id, username, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at
 FROM "sessions"
