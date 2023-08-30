@@ -26,28 +26,32 @@ func TestSignupAPI(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		userID        int64
+		userEmail     string
 		buildStubs    func(signupUsecase *mock_domain.MockSignupUsecase)
 		checkResponce func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
-			name:   "OK",
-			userID: user.ID,
+			name:      "OK",
+			userEmail: user.Email,
 			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
 				signupUsecase.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Times(1).
 					Return(domain.User{}, sql.ErrNoRows)
 
 				signupUsecase.EXPECT().
 					GetUserByUsername(gomock.Any(), gomock.Any()).
+					Times(1).
 					Return(domain.User{}, sql.ErrNoRows)
 
 				signupUsecase.EXPECT().
 					Create(gomock.Any(), gomock.Any()).
+					Times(1).
 					Return(nil)
 
 				signupUsecase.EXPECT().
 					CreateTokens(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(1).
 					Return("token1", "token2", nil)
 			},
 			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -55,59 +59,89 @@ func TestSignupAPI(t *testing.T) {
 			},
 		},
 		{
-			name:   "FoundEmail",
-			userID: user.ID,
+			name:      "FoundEmail",
+			userEmail: user.Email,
 			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
 				signupUsecase.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Times(1).
 					Return(user, nil)
+				signupUsecase.EXPECT().
+					GetUserByUsername(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				signupUsecase.EXPECT().
+					Create(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				signupUsecase.EXPECT().
+					CreateTokens(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(0)
 			},
 			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusConflict, recorder.Code)
 			},
 		},
 		{
-			name:   "FoundUsername",
-			userID: user.ID,
+			name:      "FoundUsername",
+			userEmail: user.Email,
 			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
 				signupUsecase.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Times(1).
 					Return(domain.User{}, sql.ErrNoRows)
 
 				signupUsecase.EXPECT().
 					GetUserByUsername(gomock.Any(), gomock.Any()).
+					Times(1).
 					Return(user, nil)
+
+				signupUsecase.EXPECT().
+					Create(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				signupUsecase.EXPECT().
+					CreateTokens(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(0)
 			},
 			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusConflict, recorder.Code)
 			},
 		},
 		{
-			name:   "CreateError",
-			userID: user.ID,
+			name:      "CreateError",
+			userEmail: user.Email,
 			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
 				signupUsecase.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Times(1).
 					Return(domain.User{}, sql.ErrNoRows)
 
 				signupUsecase.EXPECT().
 					GetUserByUsername(gomock.Any(), gomock.Any()).
+					Times(1).
 					Return(domain.User{}, sql.ErrNoRows)
 
 				signupUsecase.EXPECT().
 					Create(gomock.Any(), gomock.Any()).
+					Times(1).
 					Return(sql.ErrConnDone)
+
+				signupUsecase.EXPECT().
+					CreateTokens(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(0)
 			},
 			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
 		{
-			name:   "CreateTokensError",
-			userID: user.ID,
+			name:      "CreateTokensError",
+			userEmail: user.Email,
 			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
 				signupUsecase.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Times(1).
 					Return(domain.User{}, sql.ErrNoRows)
 
 				signupUsecase.EXPECT().
@@ -116,14 +150,68 @@ func TestSignupAPI(t *testing.T) {
 
 				signupUsecase.EXPECT().
 					Create(gomock.Any(), gomock.Any()).
+					Times(1).
 					Return(nil)
 
 				signupUsecase.EXPECT().
 					CreateTokens(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(1).
 					Return("", "", sql.ErrConnDone)
 			},
 			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name:      "CreateTokensError",
+			userEmail: user.Email,
+			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
+				signupUsecase.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(domain.User{}, sql.ErrNoRows)
+
+				signupUsecase.EXPECT().
+					GetUserByUsername(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(domain.User{}, sql.ErrNoRows)
+
+				signupUsecase.EXPECT().
+					Create(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(nil)
+
+				signupUsecase.EXPECT().
+					CreateTokens(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(1).
+					Return("", "", sql.ErrConnDone)
+			},
+			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name:      "BadRequest",
+			userEmail: "invalid-email",
+			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
+				signupUsecase.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				signupUsecase.EXPECT().
+					GetUserByUsername(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				signupUsecase.EXPECT().
+					Create(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				signupUsecase.EXPECT().
+					CreateTokens(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
 	}
@@ -144,7 +232,7 @@ func TestSignupAPI(t *testing.T) {
 			values := gin.H{
 				"full_name":  user.FullName,
 				"username":   user.Username,
-				"email":      user.Email,
+				"email":      testCase.userEmail,
 				"password":   user.Password,
 				"birth_date": user.BirthDate,
 			}
