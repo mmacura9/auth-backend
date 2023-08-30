@@ -146,33 +146,6 @@ func TestSignupAPI(t *testing.T) {
 
 				signupUsecase.EXPECT().
 					GetUserByUsername(gomock.Any(), gomock.Any()).
-					Return(domain.User{}, sql.ErrNoRows)
-
-				signupUsecase.EXPECT().
-					Create(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(nil)
-
-				signupUsecase.EXPECT().
-					CreateTokens(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-					Times(1).
-					Return("", "", sql.ErrConnDone)
-			},
-			checkResponce: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusInternalServerError, recorder.Code)
-			},
-		},
-		{
-			name:      "CreateTokensError",
-			userEmail: user.Email,
-			buildStubs: func(signupUsecase *mock_domain.MockSignupUsecase) {
-				signupUsecase.EXPECT().
-					GetUserByEmail(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(domain.User{}, sql.ErrNoRows)
-
-				signupUsecase.EXPECT().
-					GetUserByUsername(gomock.Any(), gomock.Any()).
 					Times(1).
 					Return(domain.User{}, sql.ErrNoRows)
 
