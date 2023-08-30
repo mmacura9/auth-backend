@@ -33,7 +33,16 @@ sqlc:
 test:
 	go test -v -cover ./...
 
-mock:
+mockdb:
 	mockgen -destination db/mock/store.go github.com/ChooseCruise/choosecruise-backend/db/sqlc Store
 
-.PHONY: getdep updatedep start postgres createdb dropdb migrateup migratedown sqlc test new_migration mock
+mockLogin:
+	mockgen -destination domain/mock/login.go github.com/ChooseCruise/choosecruise-backend/domain LoginUsecase
+
+mockSignup:
+	mockgen -destination domain/mock/signup.go github.com/ChooseCruise/choosecruise-backend/domain SignupUsecase
+
+mockRefreshToken:
+	mockgen -destination domain/mock/refreshToken.go github.com/ChooseCruise/choosecruise-backend/domain RefreshTokenUsecase
+
+.PHONY: getdep updatedep start postgres createdb dropdb migrateup migratedown sqlc test new_migration mockdb mockLogin mockSignup mockRefreshToken
