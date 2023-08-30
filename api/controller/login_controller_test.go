@@ -146,9 +146,9 @@ func TestLoginAPI(t *testing.T) {
 			recorder := httptest.NewRecorder()
 
 			url := "/api/v1/auth/login"
-			values := gin.H{
-				"email":    testCase.userEmail,
-				"password": user.Password,
+			values := domain.LoginRequest{
+				Email:    testCase.userEmail,
+				Password: user.Password,
 			}
 
 			jsonValue, err := json.Marshal(values)
@@ -156,6 +156,7 @@ func TestLoginAPI(t *testing.T) {
 
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonValue))
 			require.NoError(t, err)
+
 			request.Header.Set("Content-Type", "application/json")
 
 			lc := LoginController{
