@@ -81,3 +81,27 @@ func TestGetSessionByUsername(t *testing.T) {
 	require.WithinDuration(t, session.CreatedAt, s1.CreatedAt, time.Second)
 	require.WithinDuration(t, session.ExpiresAt, s1.ExpiresAt, time.Second)
 }
+
+func TestUpdateSession(t *testing.T) {
+	session := createRandomSession(t)
+	maker, err := tokenutil.NewPasetoMaker(randomutil.RandomString(32))
+	require.NoError(t, err)
+
+	username := randomutil.RandomUsername()
+	duration := time.Minute
+
+	token, payload, err := maker.CreateToken(username, duration)
+	require.NoError(t, err)
+	require.NotEmpty(t, token)
+	require.NotEmpty(t, payload)
+
+	arg := UpdateSessionParams{
+		ID:           session.ID,
+		RefreshToken: token,
+		ExpiresAt:    time.Now().Add(duration),
+	}
+
+	session1, err := testQueries.UpdateSession(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, session1)
+}
