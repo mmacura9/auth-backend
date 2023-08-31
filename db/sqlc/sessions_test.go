@@ -101,7 +101,7 @@ func TestUpdateSession(t *testing.T) {
 		ExpiresAt:    time.Now().UTC().Add(duration),
 	}
 
-	session1, err := testQueries.UpdateSession(context.Background(), arg)
+	session1, err := testStore.UpdateSession(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, session1)
 }
