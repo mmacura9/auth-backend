@@ -28,11 +28,6 @@ func (urs userRepository) Create(c context.Context, user *domain.User) error {
 	return err
 }
 
-func (urs userRepository) Fetch(c context.Context) ([]domain.User, error) {
-
-	return nil, nil
-}
-
 func (urs userRepository) GetByEmail(c context.Context, email string) (domain.User, error) {
 	usr, err := urs.store.GetUserByEmail(c, email)
 	if err != nil {

@@ -1,13 +1,12 @@
 package controller
 
 import (
-	"net/http"
-
 	"github.com/ChooseCruise/choosecruise-backend/bootstrap"
 	"github.com/ChooseCruise/choosecruise-backend/domain"
 	"github.com/ChooseCruise/choosecruise-backend/internal/tokenutil"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 )
 
 type SignupController struct {
