@@ -13,7 +13,7 @@ func TestPasetoMaker(t *testing.T) {
 
 	username := randomutil.RandomUsername()
 	duration := time.Minute
-	issuedAt := time.Now()
+	issuedAt := time.Now().UTC()
 	expiredAt := issuedAt.Add(duration)
 
 	token, payload, err := maker.CreateToken(username, duration)

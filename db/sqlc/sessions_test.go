@@ -29,7 +29,7 @@ func createRandomSession(t *testing.T) Session {
 		UserAgent:    randomutil.RandomString(10),
 		ClientIp:     "0.0.0.0",
 		IsBlocked:    false,
-		ExpiresAt:    time.Now().Add(duration),
+		ExpiresAt:    time.Now().UTC().Add(duration),
 	}
 
 	session, err := testQueries.CreateSession(context.Background(), arg)
@@ -98,7 +98,7 @@ func TestUpdateSession(t *testing.T) {
 	arg := UpdateSessionParams{
 		ID:           session.ID,
 		RefreshToken: token,
-		ExpiresAt:    time.Now().Add(duration),
+		ExpiresAt:    time.Now().UTC().Add(duration),
 	}
 
 	session1, err := testQueries.UpdateSession(context.Background(), arg)

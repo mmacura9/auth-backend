@@ -238,8 +238,8 @@ func randomUser() domain.User {
 		Email:     randomutil.RandomEmail(),
 		Password:  randomutil.RandomPassword(),
 		BirthDate: randomutil.RandomBirthDate(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		LastLogin: time.Now(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		LastLogin: time.Now().UTC(),
 	}
 }
