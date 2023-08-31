@@ -33,18 +33,12 @@ func (srs sessionRepository) Create(c context.Context, session *domain.Session) 
 	return err
 }
 
-func (srs sessionRepository) Fetch(c context.Context) ([]domain.Session, error) {
-	sessions, err := srs.store.GetAllSessions(c)
-	var out []domain.Session
-	for _, sessionEntity := range sessions {
-		session := domain.ToSessionDomain(sessionEntity)
-		out = append(out, *session)
-	}
-	return out, err
-}
-
 func (srs sessionRepository) GetByUsername(c context.Context, username string) ([]domain.Session, error) {
 	sessions, err := srs.store.GetSessionByUsername(c, username)
+	if err != nil {
+		return []domain.Session{}, err
+	}
+
 	var out []domain.Session
 
 	for _, sessionEntity := range sessions {
@@ -57,6 +51,9 @@ func (srs sessionRepository) GetByUsername(c context.Context, username string) (
 
 func (srs sessionRepository) GetByID(c context.Context, id string) (domain.Session, error) {
 	session, err := srs.store.GetSessionByID(c, id)
+	if err != nil {
+		return domain.Session{}, err
+	}
 
 	out := domain.ToSessionDomain(session)
 	return *out, err

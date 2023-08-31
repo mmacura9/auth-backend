@@ -43,5 +43,30 @@ func TestGetUserByEmail(t *testing.T) {
 	require.Equal(t, user.FullName, user1.FullName)
 	require.Equal(t, user.Password, user1.Password)
 	require.WithinDuration(t, user.BirthDate, user1.BirthDate, time.Second)
+}
 
+func TestGetUserByEmailUserNotExist(t *testing.T) {
+	user, err := userRep.GetByEmail(context.Background(), "...")
+	require.Error(t, err)
+	require.Empty(t, user)
+}
+
+func TestGetUserByUsername(t *testing.T) {
+	user := createRandomUser(t)
+
+	user1, err := userRep.GetByUsername(context.Background(), user.Username)
+	require.NoError(t, err)
+	require.NotEmpty(t, user1)
+
+	require.Equal(t, user.Email, user1.Email)
+	require.Equal(t, user.Username, user1.Username)
+	require.Equal(t, user.FullName, user1.FullName)
+	require.Equal(t, user.Password, user1.Password)
+	require.WithinDuration(t, user.BirthDate, user1.BirthDate, time.Second)
+}
+
+func TestGetUserByUsernameUserNotExist(t *testing.T) {
+	user, err := userRep.GetByUsername(context.Background(), "...")
+	require.Error(t, err)
+	require.Empty(t, user)
 }

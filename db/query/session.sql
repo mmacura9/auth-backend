@@ -27,7 +27,3 @@ WHERE "username" = $1;
 SELECT *
 FROM "sessions"
 WHERE "id" = $1;
-
--- name: GetAllSessions :many
-SELECT *
-FROM "sessions";

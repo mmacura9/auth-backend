@@ -29,7 +29,7 @@ func createRandomSession(t *testing.T) Session {
 		UserAgent:    randomutil.RandomString(10),
 		ClientIp:     "0.0.0.0",
 		IsBlocked:    false,
-		ExpiresAt:    time.Now().Add(duration),
+		ExpiresAt:    time.Now().UTC().Add(duration),
 	}
 
 	session, err := testQueries.CreateSession(context.Background(), arg)
@@ -80,4 +80,28 @@ func TestGetSessionByUsername(t *testing.T) {
 	require.Equal(t, session.IsBlocked, s1.IsBlocked)
 	require.WithinDuration(t, session.CreatedAt, s1.CreatedAt, time.Second)
 	require.WithinDuration(t, session.ExpiresAt, s1.ExpiresAt, time.Second)
+}
+
+func TestUpdateSession(t *testing.T) {
+	session := createRandomSession(t)
+	maker, err := tokenutil.NewPasetoMaker(randomutil.RandomString(32))
+	require.NoError(t, err)
+
+	username := randomutil.RandomUsername()
+	duration := time.Minute
+
+	token, payload, err := maker.CreateToken(username, duration)
+	require.NoError(t, err)
+	require.NotEmpty(t, token)
+	require.NotEmpty(t, payload)
+
+	arg := UpdateSessionParams{
+		ID:           session.ID,
+		RefreshToken: token,
+		ExpiresAt:    time.Now().UTC().Add(duration),
+	}
+
+	session1, err := testQueries.UpdateSession(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, session1)
 }
