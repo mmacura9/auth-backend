@@ -28,7 +28,7 @@ func NewPayload(username string, duration time.Duration) (*Payload, error) {
 	return &Payload{
 		ID:        tokenID,
 		Username:  username,
-		IssuedAt:  time.Now(),
-		ExpiredAt: time.Now().Add(duration),
+		IssuedAt:  time.Now().UTC(),
+		ExpiredAt: time.Now().UTC().Add(duration),
 	}, nil
 }

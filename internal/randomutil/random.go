@@ -33,7 +33,7 @@ func RandomFullName() string {
 }
 
 func RandomBirthDate() time.Time {
-	return time.Date(int(RandomInt(1970, 2010)), time.Month(RandomInt(1, 12)), int(RandomInt(1, 28)), 0, 0, 0, 0, time.Now().Location())
+	return time.Date(int(RandomInt(1970, 2010)), time.Month(RandomInt(1, 12)), int(RandomInt(1, 28)), 0, 0, 0, 0, time.Now().UTC().Location())
 }
 
 func RandomPassword() string {

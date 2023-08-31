@@ -29,14 +29,14 @@ func createRandomSession(t *testing.T) Session {
 		UserAgent:    randomutil.RandomString(10),
 		ClientIp:     "0.0.0.0",
 		IsBlocked:    false,
-		ExpiresAt:    time.Now().Add(duration),
+		ExpiresAt:    time.Now().UTC().Add(duration),
 	}
 
-	session, err := testQueries.CreateSession(context.Background(), arg)
+	session, err := testStore.CreateSession(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, session)
 
-	session1, err := testQueries.CreateSession(context.Background(), arg)
+	session1, err := testStore.CreateSession(context.Background(), arg)
 	require.Error(t, err)
 	require.Empty(t, session1)
 	return session
@@ -49,7 +49,7 @@ func TestCreateSession(t *testing.T) {
 func TestGetSessionById(t *testing.T) {
 	session := createRandomSession(t)
 
-	s1, err := testQueries.GetSessionByID(context.Background(), session.ID)
+	s1, err := testStore.GetSessionByID(context.Background(), session.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, s1)
 
@@ -66,7 +66,7 @@ func TestGetSessionById(t *testing.T) {
 func TestGetSessionByUsername(t *testing.T) {
 	session := createRandomSession(t)
 
-	session1, err := testQueries.GetSessionByUsername(context.Background(), session.Username)
+	session1, err := testStore.GetSessionByUsername(context.Background(), session.Username)
 	require.NoError(t, err)
 	require.NotEmpty(t, session1)
 

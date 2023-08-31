@@ -18,7 +18,7 @@ func createRandomUser(t *testing.T) User {
 		BirthDate: randomutil.RandomBirthDate(),
 	}
 
-	user1, err := testQueries.CreateUser(context.Background(), arg)
+	user1, err := testStore.CreateUser(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, user1)
 
@@ -27,7 +27,7 @@ func createRandomUser(t *testing.T) User {
 	require.NotZero(t, user1.LastLogin)
 	require.NotZero(t, user1.UpdatedAt)
 
-	user, err := testQueries.CreateUser(context.Background(), arg)
+	user, err := testStore.CreateUser(context.Background(), arg)
 	require.Error(t, err)
 	require.Empty(t, user)
 	return user1
@@ -40,7 +40,7 @@ func TestCreateUser(t *testing.T) {
 func TestGetUserByEmail(t *testing.T) {
 	user := createRandomUser(t)
 
-	user1, err := testQueries.GetUserByEmail(context.Background(), user.Email)
+	user1, err := testStore.GetUserByEmail(context.Background(), user.Email)
 	require.NoError(t, err)
 	require.NotEmpty(t, user1)
 
@@ -66,10 +66,10 @@ func TestGetUserByEmail(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	user := createRandomUser(t)
 
-	err := testQueries.DeleteUser(context.Background(), user.Username)
+	err := testStore.DeleteUser(context.Background(), user.Username)
 	require.NoError(t, err)
 
-	user1, err := testQueries.GetUserByEmail(context.Background(), user.Email)
+	user1, err := testStore.GetUserByEmail(context.Background(), user.Email)
 	require.Error(t, err)
 	require.Empty(t, user1)
 }
@@ -77,7 +77,7 @@ func TestDeleteUser(t *testing.T) {
 func TestGetUserByUsername(t *testing.T) {
 	user := createRandomUser(t)
 
-	user1, err := testQueries.GetUserByUsername(context.Background(), user.Username)
+	user1, err := testStore.GetUserByUsername(context.Background(), user.Username)
 	require.NoError(t, err)
 	require.NotEmpty(t, user1)
 

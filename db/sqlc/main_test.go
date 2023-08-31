@@ -1,26 +1,26 @@
 package db
 
 import (
-	"database/sql"
+	"context"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"os"
 	"testing"
 
 	"github.com/ChooseCruise/choosecruise-backend/bootstrap"
-	_ "github.com/lib/pq"
 )
 
-var testQueries *Queries
+var testStore Store
 
 func TestMain(m *testing.M) {
 	env := bootstrap.LoadEnv("../..")
-	conn, err := sql.Open(env.DBDriver, env.DBSource)
 
+	connPool, err := pgxpool.New(context.Background(), env.DBSource)
 	if err != nil {
-		log.Fatal("cannot connect to db")
+		log.Fatal("cannot connect to db: ", err)
 	}
 
-	testQueries = New(conn)
+	testStore = NewStore(connPool)
 
 	os.Exit(m.Run())
 }

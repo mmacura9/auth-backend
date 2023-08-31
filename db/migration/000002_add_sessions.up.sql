@@ -8,6 +8,6 @@ CREATE TABLE IF NOT EXISTS "sessions" (
     "user_agent" VARCHAR(255) NOT NULL,
     "client_ip" VARCHAR(45) NOT NULL,
     "is_blocked" BOOLEAN NOT NULL DEFAULT false,
-    "expires_at" TIMESTAMP NOT NULL,
-    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "expires_at" timestamptz NOT NULL,
+    "created_at" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
