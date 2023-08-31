@@ -156,6 +156,7 @@ func TestLoginAPI(t *testing.T) {
 
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonValue))
 			require.NoError(t, err)
+
 			request.Header.Set("Content-Type", "application/json")
 
 			lc := LoginController{

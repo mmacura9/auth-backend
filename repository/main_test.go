@@ -1,7 +1,8 @@
 package repository
 
 import (
-	"database/sql"
+	"context"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"os"
 	"testing"
@@ -18,13 +19,13 @@ var sessionRep domain.SessionRepository
 
 func TestMain(m *testing.M) {
 	env := bootstrap.LoadEnv("..")
-	conn, err := sql.Open(env.DBDriver, env.DBSource)
 
+	connPool, err := pgxpool.New(context.Background(), env.DBSource)
 	if err != nil {
-		log.Fatal("cannot connect to db")
+		log.Fatal("cannot connect to db: ", err)
 	}
 
-	testStore = db.NewStore(conn)
+	testStore = db.NewStore(connPool)
 	userRep = NewUserRepository(testStore)
 	sessionRep = NewSessionRepository(testStore)
 

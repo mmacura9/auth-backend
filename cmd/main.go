@@ -1,15 +1,16 @@
 package main
 
 import (
-	"database/sql"
+	"context"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"time"
 
-	route "github.com/ChooseCruise/choosecruise-backend/api/route"
+	"github.com/ChooseCruise/choosecruise-backend/api/route"
 	"github.com/ChooseCruise/choosecruise-backend/bootstrap"
 	db "github.com/ChooseCruise/choosecruise-backend/db/sqlc"
 	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq"
+	_ "github.com/jackc/pgx/v5"
 )
 
 func main() {
@@ -18,12 +19,12 @@ func main() {
 
 	env := app.Env
 
-	conn, err := sql.Open(env.DBDriver, env.DBSource)
+	connPool, err := pgxpool.New(context.Background(), env.DBSource)
 	if err != nil {
-		log.Fatal("cannot connect to the db: ", err)
+		log.Fatal("cannot connect to db: ", err)
 	}
 
-	store := db.NewStore(conn)
+	store := db.NewStore(connPool)
 
 	timeout := time.Second * 2
 
